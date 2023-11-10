@@ -1,0 +1,19 @@
+﻿
+{
+    "name": "NewRelic.Agent.Editor",
+    "references": [
+        "GUID:7dde6807ec2a448e5a2cd810ee81a054",
+        "GUID:c8624e30aafa04540afbaf8cb6bc7ec1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
