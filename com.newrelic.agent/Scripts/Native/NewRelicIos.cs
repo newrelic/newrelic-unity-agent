@@ -5,11 +5,12 @@ using UnityEngine;
 using System.Text.RegularExpressions;
 using NewRelic.Utilities;
 
+
+#if UNITY_IPHONE
 namespace NewRelic.Native
 {
 
-#if UNITY_IPHONE
-	public class NewRelicIos : NewRelic
+    public class NewRelicIos : NewRelic
 	{
 
 
@@ -663,6 +664,4 @@ namespace NewRelic.Native
 		public int LineNumber { get; }
 	}
 }
-
 #endif
-}

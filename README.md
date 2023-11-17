@@ -1,50 +1,236 @@
-<a href="https://opensource.newrelic.com/oss-category/#community-project"><picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/dark/Community_Project.png"><source media="(prefers-color-scheme: light)" srcset="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Project.png"><img alt="New Relic Open Source community project banner." src="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Project.png"></picture></a>
+[![Community Plus header](https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Plus.png)](https://opensource.newrelic.com/oss-category/#community-plus)
 
-# [Name of Project] [build badges go here when available]
 
->[Brief description - what is the project and value does it provide? How often should users expect to get releases? How is versioning set up? Where does this project want to go?]
+# New Relic Unity Agent
+
+This agent utilizes the native New Relic Android and iOS agents to instrument Unity apps. The New Relic SDKs gather data such as crashes, network traffic, and other relevant information to help monitor and assess the performance of Unity apps.
+
+## Features
+* Record and Capture C# errors
+* Network Instrumentation
+* Distributed Tracing 
+* Tracking UnityEngine Debug log, assert and error
+* Handled Exception
+* Capture interactions and the sequence in which they were created
+* Pass user information to New Relic to track user sessions
+* Scene Navigation as Interactions
+* Capture Native C++ Errors
+
+## Current Support:
+- Android API 24+ (AGP 7 and Higher)
+- iOS 10
+- Depends on New Relic iOS/XCFramework and Android agents
 
 ## Installation
 
-> [Include a step-by-step procedure on how to get your code installed. Be sure to include any third-party dependencies that need to be installed separately]
+1. Downloading the package
+   If you haven’t already done so, [download the NewRelic SDK for Unity](https://github.com/ndesai-newrelic/newrelic-unity-agent/blob/unity_without_framework/NewRelic.unitypackage).
 
-## Getting Started
->[Simple steps to start working with the software similar to a "Hello World"]
+2. Importing the package
+   In your Unity IDE, click Assets → Import Package → Custom Package and Import the NewRelic package.
+  <img width="624" alt="Screenshot 2023-07-13 at 1 07 02 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/22fb6d19-bf90-446e-a560-6a95815a094e">
+
+3. Open the NewRelic editor
+
+In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewRelic editor window.
+<img width="622" alt="Screenshot 2023-07-13 at 1 07 46 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/2691a4a0-b0a0-4f4a-8532-f8f1e7975a6e">
+
+4. Update your app information on the editor
+   Select Android and enter the App token:
+
+   AppToken is platform-specific. You need to generate the seprate token for Android and iOS apps to get better Visibility at app level.
+
+
+5. External Dependency Manager support (do not skip this step!)
+   If using the Unity External Dependency Manager plug-in, disable the NewRelic dependency resolver at the root level in **launcherTemplate.gradle**:
+
+```groovy
+ apply plugin: 'com.android.application'
+ **apply plugin: 'newrelic'**
+dependencies {
+    implementation project(':unityLibrary')
+    implementation 'com.newrelic.agent.android:agent-ndk:1.+' 
+    implementation 'com.newrelic.agent.android:android-agent:7.2.0' 
+    }
+
+android {
+    compileSdkVersion **APIVERSION**
+    buildToolsVersion '**BUILDTOOLS**'
+
+```
+
+6. Customize Gradle Templates
+   If using Unity 2019 or later, add the following to your Gradle files:
+
+   1.Include the New Relic Maven repository URL in the Gradle build settings. To do this, open your **mainTemplate.gradle** file (usually located in Assets/Plugins/Android folder) and add the New Relic Maven URL like this:
+
+```groovy
+   allprojects {
+    buildscript {
+        repositories {**ARTIFACTORYREPOSITORY**
+            google()
+            jcenter()
+            mavenCentral()
+        }
+```
+  2. Add the New Relic classpath to your project-level **baseProjectTemplate.gradle** file (typically located in the android folder in your Unity project):
+```groovy
+        dependencies {
+            // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
+            // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
+            // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
+            // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.2.0'
+            **BUILD_SCRIPT_DEPS**
+        }
+    }
+
+ ```
+  By making these changes in your Gradle files, you will ensure that the New Relic artifacts are properly downloaded and included in your Unity project.
+
+7.Make sure your app requests INTERNET and ACCESS_NETWORK_STATE permissions by adding these lines to your AndroidManifest.xml
+
+ ``` xml
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  ```
+
+8. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
+
+<img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
 
 ## Usage
->[**Optional** - Include more thorough instructions on how to use the software. This section might not be needed if the Getting Started section is enough. Remove this section if it's not needed.]
+See the examples below, and for more detail, see [New Relic IOS SDK doc](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-ios/ios-sdk-api) or [Android SDK](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api).
+
+### [startInteractionWithName](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/start-interaction)(string name): &lt;InteractionId&gt;;
+> Track a method as an interaction.
+
+`InteractionId` is string.
 
 
-## Building
+### [stopCurrentInteraction](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/end-interaction)(string interactionIdentifier): void;
+> End an interaction
+> (Required). This uses the string ID for the interaction you want to end.
+> This string is returned when you use startInteraction().
 
->[**Optional** - Include this section if users will need to follow specific instructions to build the software from source. Be sure to include any third party build dependencies that need to be installed separately. Remove this section if it's not needed.]
+  ```C#
 
-## Testing
+        string interActionId = NewRelicAgent.StartInteractionWithName("Unity InterAction Example");
 
->[**Optional** - Include instructions on how to run tests if we include tests with the codebase. Remove this section if it's not needed.]
+        for(int i =0; i < 4;i++)
+        {
+            Thread.Sleep(1000);
+        }
 
-## Support
+        NewRelicAgent.StopCurrentInteraction(interActionId);
+  
+  ```
 
-New Relic hosts and moderates an online forum where you can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub. You can find this project's topic/threads here:
+### [setAttribute](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/set-attribute)(string name, string|double value): void;
+> Creates a session-level attribute shared by multiple mobile event types. Overwrites its previous value and type each time it is called.
+  ```C#
+     NewRelicAgent.setAttribute('UnityCustomAttrNumber', 37);
+  ```
+### [removeAttribute](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/remove-attribute)(string name): void;
+> This method removes the attribute specified by the name string..
+  ```C#
+     NewRelicAgent.removeAttribute('UnityCustomAttrNumber');
+  ```
 
->Add the url for the support thread here: discuss.newrelic.com
+### [incrementAttribute](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/increment-attribute)(string name, double amount): void;
+> Increments the count of an attribute with a specified name. Overwrites its previous value and type each time it is called. If the attribute does not exists, it creates a new attribute. If no value is given, it increments the value by 1.
+```C#
+    NewRelicAgent.incrementAttribute('UnityCustomAttrNumber');
+    NewRelicAgent.incrementAttribute('UnityCustomAttrNumber', 5);
+```
 
-## Contribute
+### [setUserId](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/set-user-id)(string userId): void;
+> Set a custom user identifier value to associate user sessions with analytics events and attributes.
+  ```C#
+     NewRelicAgent.setUserId("Unity12934");
+  ```
 
-We encourage your contributions to improve [project name]! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+### [recordBreadcrumb](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/recordbreadcrumb)(string name, Dictionary<string, object> attributes): bool;
+> Track app activity/screen that may be helpful for troubleshooting crashes.
 
-If you have any questions, or to execute our corporate CLA (which is required if your contribution is on behalf of a company), drop us an email at opensource@newrelic.com.
+  ```C#
+        Dictionary<string, object> dic = new Dictionary<string, object>();
+        dic.Add("Unity Attribute", "Data1");
 
-**A note about vulnerabilities**
+        NewRelicAgent.RecordBreadCrumb("Unity BreadCrumb Example", dic);
+  ```
 
-As noted in our [security policy](../../security/policy), New Relic is committed to the privacy and security of our customers and their data. We believe that providing coordinated disclosure by security researchers and engaging with the security community are important means to achieve our security goals.
+### [recordCustomEvent](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/recordcustomevent-android-sdk-api)(string name, Dictionary<string, object> attributes): bool;
+> Creates and records a custom event for use in New Relic Insights.
 
-If you believe you have found a security vulnerability in this project or any of New Relic's products or websites, we welcome and greatly appreciate you reporting it to New Relic through [HackerOne](https://hackerone.com/newrelic).
+  ```C#
+        Dictionary<string, object> dic = new Dictionary<string, object>();
+        dic.Add("Unity Custom Attribute", "Data2");
 
-If you would like to contribute to this project, review [these guidelines](./CONTRIBUTING.md).
+        NewRelicAgent.RecordCustomEvent("Unity Custom Event Example", dic);
+  ```
 
-To all contributors, we thank you!  Without your contribution, this project would not be what it is today.  We also host a community project page dedicated to [Project Name](<LINK TO https://opensource.newrelic.com/projects/... PAGE>).
 
-## License
-[Project Name] is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
->[If applicable: The [project name] also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.]
+### [currentSessionId](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/currentsessionid-android-sdk-api)(): string;
+> Returns the current session ID. This method is useful for consolidating monitoring of app data (not just New Relic data) based on a single session definition and identifier.
+```C#
+    string sessionId =  NewRelicAgent.currentSessionId();
+```
+
+### [noticeHttpTransaction](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/notice-http-transaction/)(string httpMethod, int statusCode,long startTime,long endTime,long bytesSent,long bytesReceived,string responseBody, Dictionary<string,object> dtHeaders): void;
+> Tracks network requests manually. You can use this method to record HTTP transactions, with an option to also send a response body.
+```C#
+    NewRelicAgent.noticeHttpTransaction('https://github.com', 'GET', 200, DateTimeOffset.Now.ToUnixTimeMilliseconds(), DateTimeOffset.Now.ToUnixTimeMilliseconds()+1000, 100, 101, "response body",null);
+```
+
+
+### [recordMetric](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/recordmetric-android-sdk-api)(string name, string category,double value, NewRelicAgent.MetricUnit valueUnits,NewRelicAgent.MetricUnit countUnits): void;
+> Records custom metrics (arbitrary numerical data), where countUnit is the measurement unit of the metric count and valueUnit is the measurement unit for the metric value. If using countUnit or valueUnit, then all of value, countUnit, and valueUnit must all be set.
+```C#
+    NewRelicAgent.recordMetricWithName('UnityCustomMetricName', 'UnityCustomMetricCategory');
+    NewRelicAgent.recordMetricWithName('UnityCustomMetricName', 'UnityCustomMetricCategory', 12);
+    NewRelicAgent.recordMetricWithName('UnityCustomMetricName', 'UnityCustomMetricCategory', 13, NewRelicAgent.MetricUnit.PERCENT, NewRelicAgent.MetricUnit.SECONDS);
+```
+
+### [removeAllAttributes](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/remove-all-attributes)(): void;
+> Removes all attributes from the session
+```C#
+    NewRelicAgent.RemoveAllAttributes();
+```
+
+### recordError(e: string|error): void;
+> Records C# errors for Unity.
+```C#
+    try {
+      string foo;
+      foo.Length;
+    } catch (Exception e)
+    {
+        NewRelicAgent.RecordException(e);
+    }
+```
+
+### [setMaxEventBufferTime](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/set-max-event-buffer-time)(uint seconds): void;
+> Sets the event harvest cycle length. Default is 600 seconds (10 minutes). Minimum value can not be less than 60 seconds. Maximum value should not be greater than 600 seconds.
+```C#
+    NewRelicAgent.setMaxEventBufferTime(60);
+```
+
+### [setMaxEventPoolSize](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/set-max-event-pool-size)(uint size): void;
+> Sets the maximum size of the event pool stored in memory until the next harvest cycle. Default is a maximum of 1000 events per event harvest cycle. When the pool size limit is reached, the agent will start sampling events, discarding some new and old, until the pool of events is sent in the next harvest cycle.
+```C#
+    NewRelicAgent.setMaxEventPoolSize(2000);
+```
+
+
+
+## How to see C# Errors(Fatal/Non Fatal) in NewRelic One?
+
+C# errors and handled exceptions can be seen in the `Handled Exceptions` tab in New Relic One. You will be able to see the event trail, attributes, and stack trace for each C# error recorded.
+
+You can also build a dashboard for these errors using this query:
+
+```sql
+SELECT * FROM MobileHandledException SINCE 24 hours ago
+```
+
