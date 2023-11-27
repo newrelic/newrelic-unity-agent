@@ -23,25 +23,23 @@ This agent utilizes the native New Relic Android and iOS agents to instrument Un
 
 ## Installation
 
-1. Downloading the package
-   If you haven’t already done so, [download the NewRelic SDK for Unity](https://github.com/ndesai-newrelic/newrelic-unity-agent/blob/unity_without_framework/NewRelic.unitypackage).
+1. Scoped Registries allow Unity to communicate the location of any custom package registry server to the Package Manager so that the user has access to several collections of packages at the same time. NewRelic uses Scoped 
+   Registries to allow our users to manage, download and install our SDK using the built-in Unity Package Manager.
+   
+<img width="801" alt="Screenshot 2023-11-27 at 2 03 05 PM" src="https://github.com/newrelic/newrelic-unity-agent/assets/89222514/480fdc95-d7c5-4693-9aca-09998a211609">
 
-2. Importing the package
-   In your Unity IDE, click Assets → Import Package → Custom Package and Import the NewRelic package.
-  <img width="624" alt="Screenshot 2023-07-13 at 1 07 02 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/22fb6d19-bf90-446e-a560-6a95815a094e">
-
-3. Open the NewRelic editor
+2. Open the NewRelic editor
 
 In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewRelic editor window.
 <img width="622" alt="Screenshot 2023-07-13 at 1 07 46 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/2691a4a0-b0a0-4f4a-8532-f8f1e7975a6e">
 
-4. Update your app information on the editor
+3. Update your app information on the editor
    Select Android and enter the App token:
 
    AppToken is platform-specific. You need to generate the seprate token for Android and iOS apps to get better Visibility at app level.
 
 
-5. External Dependency Manager support (do not skip this step!)
+4. External Dependency Manager support (do not skip this step!)
    If using the Unity External Dependency Manager plug-in, disable the NewRelic dependency resolver at the root level in **launcherTemplate.gradle**:
 
 ```groovy
@@ -59,7 +57,7 @@ android {
 
 ```
 
-6. Customize Gradle Templates
+5. Customize Gradle Templates
    If using Unity 2019 or later, add the following to your Gradle files:
 
    1.Include the New Relic Maven repository URL in the Gradle build settings. To do this, open your **mainTemplate.gradle** file (usually located in Assets/Plugins/Android folder) and add the New Relic Maven URL like this:
@@ -88,14 +86,14 @@ android {
  ```
   By making these changes in your Gradle files, you will ensure that the New Relic artifacts are properly downloaded and included in your Unity project.
 
-7.Make sure your app requests INTERNET and ACCESS_NETWORK_STATE permissions by adding these lines to your AndroidManifest.xml
+6.Make sure your app requests INTERNET and ACCESS_NETWORK_STATE permissions by adding these lines to your AndroidManifest.xml
 
  ``` xml
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   ```
 
-8. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
+7. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
 
 <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
 
