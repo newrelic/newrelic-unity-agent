@@ -25,6 +25,13 @@ This agent utilizes the native New Relic Android and iOS agents to instrument Un
 
 1. Scoped Registries allow Unity to communicate the location of any custom package registry server to the Package Manager so that the user has access to several collections of packages at the same time. NewRelic uses Scoped 
    Registries to allow our users to manage, download and install our SDK using the built-in Unity Package Manager.
+
+   In the Package Manager in the Unity IDE, download the NewRelic SDK using add package from git url
+
+   ```
+   https://github.com/newrelic/newrelic-unity-agent.git
+   
+   ```
    
 <img width="801" alt="Screenshot 2023-11-27 at 2 03 05 PM" src="https://github.com/newrelic/newrelic-unity-agent/assets/89222514/480fdc95-d7c5-4693-9aca-09998a211609">
 
@@ -72,13 +79,29 @@ android {
         }
 ```
   2. Add the New Relic classpath to your project-level **baseProjectTemplate.gradle** file (typically located in the android folder in your Unity project):
-```groovy
+
+
+  ```groovy
         dependencies {
             // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
             classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.2.0'
+            **BUILD_SCRIPT_DEPS**
+        }
+    }
+
+
+If you are utilizing an older version of Unity Studio, you can incorporate a lower version of the classpath as a dependency which supports AGP7 and lower version of Gradle.
+
+```groovy
+        dependencies {
+            // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
+            // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
+            // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
+            // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:6.11.0'
             **BUILD_SCRIPT_DEPS**
         }
     }
@@ -94,6 +117,9 @@ android {
   ```
 
 7. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
+
+  1 .Add use_frameworks! to Podfile is unchecked.
+  2. Always add the main target to Podfile box is checked.
 
 <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
 
