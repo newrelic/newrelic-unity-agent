@@ -86,7 +86,7 @@ android {
             // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
-            // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
+            // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
             classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.2.0'
             **BUILD_SCRIPT_DEPS**
         }
@@ -100,7 +100,7 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
             // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
-            // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
+            // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
             classpath 'com.newrelic.agent.android:agent-gradle-plugin:6.11.0'
             **BUILD_SCRIPT_DEPS**
         }
