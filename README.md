@@ -118,10 +118,20 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
 
 7. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
 
-  1 .Add use_frameworks! to Podfile is unchecked.
-  2. Always add the main target to Podfile box is checked.
+   1. Add use_frameworks! to Podfile is unchecked.
+   2. Always add the main target to Podfile box is checked.
 
-<img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
+  <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
+
+8. If the Podfile is not being used for iOS dependency management, you can proceed with the following steps.
+
+        1. Download and unzip the New Relic XCFramework SDK
+           Download the latest iOS agent from our [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes)
+        2. Add the New Relic XCFramework to your Xcode project
+           Unzip the SDK download, drag the “NewRelicAgent.xcframework” folder from the Finder into your Xcode project (dropping it onto your Targets Frameworks pane). Select “Embed & Sign” under the Embed column.
+
+
+
 
 ## Usage
 See the examples below, and for more detail, see [New Relic IOS SDK doc](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-ios/ios-sdk-api) or [Android SDK](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api).
@@ -257,6 +267,16 @@ You can also build a dashboard for these errors using this query:
 ```sql
 SELECT * FROM MobileHandledException SINCE 24 hours ago
 ```
+## Query Unity log data [#logs]
+
+New Relic stores your Unity logs as custom events. You can query these logs and build dashboards for them using this NRQL query:
+
+```nrql
+ SELECT * FROM `Mobile Unity Logs` SINCE 30 MINUTES AGO
+```
+
+For more information on NRQL queries, see [Introduction to NRQL](/docs/query-your-data/nrql-new-relic-query-language/get-started/introduction-nrql-new-relics-query-language/#where).
+
 ## Contribute
 
 We encourage your contributions to improve newrelic-unity-agent! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
