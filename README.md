@@ -125,11 +125,10 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
 
 8. If the Podfile is not being used for iOS dependency management, you can proceed with the following steps.
 
-        1. Download and unzip the New Relic XCFramework SDK
-           Download the latest iOS agent from our [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes)
-        2. Add the New Relic XCFramework to your Xcode project
-           Unzip the SDK download, drag the “NewRelicAgent.xcframework” folder from the Finder into your Xcode project (dropping it onto your Targets Frameworks pane). Select “Embed & Sign” under the Embed column.
-
+   1. Download and unzip the New Relic XCFramework SDK
+    Download the latest iOS agent from our [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes)
+   2. Add the New Relic XCFramework to your Xcode project
+     Unzip the SDK download, drag the “NewRelicAgent.xcframework” folder from the Finder into your Xcode project (dropping it onto your Targets Frameworks pane). Select “Embed & Sign” under the Embed column.
 
 
 
