@@ -51,8 +51,8 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
 
 ```groovy
  apply plugin: 'com.android.application'
- **apply plugin: 'newrelic'**
-dependencies {
+ apply plugin: 'newrelic'
+ dependencies {
     implementation project(':unityLibrary')
     implementation 'com.newrelic.agent.android:agent-ndk:1.+' 
     implementation 'com.newrelic.agent.android:android-agent:7.2.0' 

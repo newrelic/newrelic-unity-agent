@@ -136,6 +136,12 @@ public class NewRelicAndroid : NewRelic
     {
 
 
+        using (AndroidJavaObject platform = new AndroidJavaClass("com.newrelic.agent.android.ApplicationFramework").GetStatic<AndroidJavaObject>("Unity"))
+        {
+            agentInstance.Call<AndroidJavaObject>("withApplicationFramework", platform,"1.0.0");
+        }
+
+
         bool loggingEnabled = plugin.logLevel != NewRelicAgent.AgentLogLevel.NONE;
 
         agentInstance.Call<AndroidJavaObject>("withLoggingEnabled", loggingEnabled);
@@ -170,26 +176,11 @@ public class NewRelicAndroid : NewRelic
         }
     }
 
-    protected void setPlatform()
-    {
-        // set the platform type and version
-        using (AndroidJavaObject platform = new AndroidJavaClass("com.newrelic.agent.android.ApplicationPlatform").GetStatic<AndroidJavaObject>("Unity"))
-        {
-            agentInstance.Call<AndroidJavaObject>("withApplicationFramework", platform);
-            using (AndroidJavaObject agentConfig = pluginInstance.GetStatic<AndroidJavaObject>("agentConfiguration"))
-            {
-                agentConfig.Call("setApplicationPlatformVersion", platformVersion);
-            }
-        }
-    }
 
     override public void start(string applicationToken)
     {
         if (initialize(applicationToken))
         {
-            // set the platform type and version
-            //setPlatform();
-
             // Call the NewRelic builder methods. Must be call *before** start() method
             withBuilderMethods(agentInstance);
             AndroidJavaClass featureFlags = new AndroidJavaClass("com.newrelic.agent.android.FeatureFlag");
@@ -488,11 +479,11 @@ public class NewRelicAndroid : NewRelic
                 }
             }
 
-            using (AndroidJavaObject newRelic = new AndroidJavaObject("com.newrelic.agent.android.NewRelic"))
+            using (AndroidJavaClass newRelic = new AndroidJavaClass("com.newrelic.agent.android.NewRelic"))
             {
                 try
                 {
-                    newRelic.CallStatic<Boolean>("recordHandledException", unityException);
+                        newRelic.CallStatic<Boolean>("recordHandledException", unityException);
                 }
                 catch (Exception e)
                 {
