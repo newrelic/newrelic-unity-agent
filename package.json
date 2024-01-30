@@ -12,12 +12,14 @@
     "newrelic",
     "anr",
     "crashes",
-    "bugs"
+    "bugs",
+    "network monitoring",
+    "handle exceptions"
   ],
   "author": {
     "name": "NewRelic",
-    "email": "mobile-agents@newrelic.com ",
-    "url": "https://newrelic.com/"
+    "email": "mobile-agents@newrelic.com",
+    "url": "https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-unity/monitor-your-unity-application/"
   },
   "hideInEditor": false,
   "type": "library",
@@ -31,5 +33,5 @@
   "dependencies": {
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.nuget.mono-cecil": "1.10.2"
-  }
+    }
 }
