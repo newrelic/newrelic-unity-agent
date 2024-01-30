@@ -353,12 +353,16 @@ namespace NewRelic
             stopDefaultInteraction();
 
 #if (UNITY_ANDROID && !UNITY_EDITOR)
-		        Application.logMessageReceivedThreaded -= NewRelicAndroid.logMessageHandler;
+		        Application.logMessageReceived -= NewRelicAndroid.logMessageHandler;
 		        UnityEngine.Debug.Log ("LogMessageHandler removed");
 
 		        System.AppDomain.CurrentDomain.UnhandledException -= NewRelicAndroid.unhandledExceptionHandler;
 		        UnityEngine.Debug.Log ("UnhandledExceptionEventHandler removed");
 #endif // UNITY_ANDROID
+
+#if (UNITY_IOS)
+            Application.logMessageReceived -= NewRelicIos.logMessageHandler;
+#endif
         }
 
         void OnApplicationPause(bool pauseStatus)

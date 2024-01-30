@@ -47,7 +47,7 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
 
 
 4. External Dependency Manager support (do not skip this step!)
-   If using the Unity External Dependency Manager plug-in, disable the NewRelic dependency resolver at the root level in **launcherTemplate.gradle**:
+   If using the Unity External Dependency Manager plug-in, disable the your dependency resolver at the root level in **launcherTemplate.gradle**:
 
 ```groovy
  apply plugin: 'com.android.application'
