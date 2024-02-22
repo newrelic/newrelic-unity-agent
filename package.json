@@ -1,20 +1,22 @@
 {
   "name": "com.newrelic.agent",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "displayName": "NewRelic SDK",
   "description": "NewRelic's Unity SDK lets you bring the deep, introspective and native debugging power of NewRelic into your Unity game or application.",
   "unity": "2019.1",
   "unityRelease": "0f2",
-  "documentationUrl": "",
-  "changelogUrl": "",
-  "licensesUrl": "",
+  "documentationUrl": "https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-unity/monitor-your-unity-application/",
+  "changelogUrl": "https://github.com/newrelic/newrelic-unity-agent/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/newrelic/newrelic-unity-agent/blob/main/LICENSE",
   "keywords": [
     "newrelic",
     "anr",
     "crashes",
     "bugs",
     "network monitoring",
-    "handle exceptions"
+    "handle exceptions",
+    "games",
+    "mobile games"
   ],
   "author": {
     "name": "NewRelic",

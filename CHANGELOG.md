@@ -1,3 +1,13 @@
+## 1.3.1
+
+- Resolved an issue in UnityWebRequest instrumentation where "callvirt" instructions were erroneously replaced with "call" instructions.
+
+## 1.3.0
+
+- Resolved an issue with the application framework that was causing unexpected behavior.
+- Fixed a bug in the application log received handler, ensuring accurate and reliable logging.
+- Addressed a build issue that was causing problems with the iOS app.
+
 ## 1.0.0
 
 🎉🎊 Presenting the new NewRelic SDK for Unity:
