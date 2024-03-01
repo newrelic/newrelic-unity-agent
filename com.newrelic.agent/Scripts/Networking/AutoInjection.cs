@@ -147,7 +147,7 @@ namespace NewRelic.Networking
                                         foreach (var instructionToReplace in disposeWebRequestInstructionsToReplace)
                                         {
                                             Debug.Log("******* Replacing UnityWebRequst::DisposeWebRequestCall with wrapper call. *******");
-                                            var callWrapperInstruction = iLProcessor.Create(Mono.Cecil.Cil.OpCodes.Callvirt, disposeWebRequestWrapperMethodReference);
+                                            var callWrapperInstruction = iLProcessor.Create(Mono.Cecil.Cil.OpCodes.Call, disposeWebRequestWrapperMethodReference);
                                             iLProcessor.Replace(instructionToReplace, callWrapperInstruction);
                                         }
 
