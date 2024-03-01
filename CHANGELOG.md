@@ -1,3 +1,7 @@
+## 1.3.2
+
+- Resolved an issue in the Unity editor where an "assembly not found" error occurred for the New Relic native integration on Windows, Mac, and web platforms. 
+
 ## 1.3.1
 
 - Resolved an issue in UnityWebRequest instrumentation where "callvirt" instructions were erroneously replaced with "call" instructions.
