@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine.SceneManagement;
+#if UNITY_IPHONE || UNITY_ANDROID
 using NewRelic.Native;
+#endif
 using NewRelic.Networking;
 
 namespace NewRelic
