@@ -64,6 +64,11 @@ namespace NewRelic
         /// </summary>
         public Boolean analyticsEvents = true;
 
+        /// <summary> Enable or disable offline data storage when no internet connection is available.
+        ///  <c>true</c>
+        /// </summary>
+        public Boolean offlineStorageEnabled = true;
+
 #if UNITY_IPHONE
         /// <summary>
         /// enable disable interaction tracing.
@@ -110,6 +115,8 @@ namespace NewRelic
             HttpResponseBodyCapture = 1 << 5,   //
             AnalyticsEvents = 1 << 6,   //
             ExperimentalNetworkingInstrumentation = 1 << 13,    // iOS only: disabled by default
+            OfflineStorage = 1 << 21   // iOS only: enabled by default
+
         }
 
 
@@ -916,6 +923,19 @@ namespace NewRelic
             return null;
         }
 
+        /// <summary>
+        ///Sets the maximum size of total data that can be stored for offline storage.By default, mobile monitoring can collect a maximum of 100 megaBytes of offline storage.
+        ///When a data payload fails to send because the device doesn't have an internet connection, it can be stored in the file system until an internet connection has been made.
+        ///After a typical harvest payload has been successfully sent, all offline data is sent to New Relic and cleared from storage.
+        /// </summary>
+        /// <param name="megabytes">size of the max offline events storage.</param>
+        static public void SetMaxOfflineStorageSize(uint megabytes)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.setMaxOfflineStorageSize(megabytes);
+            }
+        }
 
 
     }

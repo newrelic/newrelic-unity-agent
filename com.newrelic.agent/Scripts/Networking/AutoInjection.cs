@@ -107,8 +107,11 @@ namespace NewRelic.Networking
 
                                         if (instructionMethodReference.FullName == "System.Void UnityEngine.Networking.UnityWebRequest::Dispose()" || instructionMethodReference.FullName == "System.Void System.IDisposable::Dispose()")
                                         {
-                                            Debug.LogFormat("Possibly instrument {0}.{1} call {2}", typeDefinition.Name, methodDefinition.Name, instructionMethodReference.FullName);
-                                            disposeWebRequestInstructionsToReplace.Add(instruction);
+                                            if (instruction.Previous.OpCode.Code != Code.Constrained)
+                                            {
+                                                Debug.LogFormat("Possibly instrument {0}.{1} call {2}", typeDefinition.Name, methodDefinition.Name, instructionMethodReference.FullName);
+                                                disposeWebRequestInstructionsToReplace.Add(instruction);
+                                            }
                                         }
                                     }
 

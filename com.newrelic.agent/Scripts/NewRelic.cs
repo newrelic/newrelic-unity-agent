@@ -149,8 +149,8 @@ namespace NewRelic
 #if UNITY_IPHONE
         public System.IntPtr handle { get; private set; }
 #elif UNITY_ANDROID
-    public System.DateTime start { get; private set; }
-    public System.DateTime end { get; private set; }
+        public System.DateTime start { get; private set; }
+        public System.DateTime end { get; private set; }
 #endif
 
         bool _running = false;
@@ -172,7 +172,7 @@ namespace NewRelic
 #if UNITY_IPHONE
             handle = NR_createTimer();
 #elif UNITY_ANDROID
-        start = System.DateTime.UtcNow;
+            start = System.DateTime.UtcNow;
 #endif
         }
 
@@ -188,7 +188,7 @@ namespace NewRelic
 #if UNITY_IPHONE
             NR_stopTimer(handle);
 #elif UNITY_ANDROID
-        end = System.DateTime.UtcNow;
+            end = System.DateTime.UtcNow;
 #endif
         }
 
@@ -301,6 +301,9 @@ namespace NewRelic
         abstract public Dictionary<string, object> noticeDistributedTrace();
 
         abstract public bool setUserId(string userId);
+
+        abstract public void setMaxOfflineStorageSize(uint megabytes);
+
 
 
     }

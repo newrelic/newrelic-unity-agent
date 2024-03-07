@@ -1,3 +1,16 @@
+
+## 1.3.3
+
+- Offline Harvesting Feature: Preserves harvest data during internet downtime, sending stored data once online.
+
+- setMaxOfflineStorageSize API: Allows setting a maximum limit for local data storage.
+
+- Upgraded native iOS Agent to 7.4.9: Offers performance upgrades and bug fixes.
+
+- Upgraded native Android Agent to 7.3.0: Improves stability and adds enhanced features.
+
+- UnityWebRequest Instrumentation Update: Fixes issue with replacement of constrained dispose calls, streamlining app building.
+
 ## 1.3.2
 
 - Resolved an issue in the Unity editor where an "assembly not found" error occurred for the New Relic native integration on Windows, Mac, and web platforms. 

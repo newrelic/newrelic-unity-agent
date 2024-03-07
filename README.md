@@ -15,6 +15,7 @@ This agent utilizes the native New Relic Android and iOS agents to instrument Un
 * Pass user information to New Relic to track user sessions
 * Scene Navigation as Interactions
 * Capture Native C++ Errors
+* offline monitoring of events and exceptions
 
 ## Current Support:
 - Android API 24+ (AGP 7 and Higher)
@@ -87,7 +88,7 @@ android {
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
-            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.2.0'
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.3.0'
             **BUILD_SCRIPT_DEPS**
         }
     }
@@ -254,6 +255,13 @@ See the examples below, and for more detail, see [New Relic IOS SDK doc](https:/
 ```C#
     NewRelicAgent.setMaxEventPoolSize(2000);
 ```
+
+### [setMaxOfflineStorageSize](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile/mobile-sdk/set-max-offline-storage/)(uint megabytes): void;
+> Sets the maximum size of total data that can be stored for offline storage.By default, mobile monitoring can collect a maximum of 100 megaBytes of offline storage. When a data payload fails to send because the device doesn't have an internet connection, it can be stored in the file system until an internet connection has been made. After a typical harvest payload has been successfully sent, all offline data is sent to New Relic and cleared from storage.
+```C#
+    NewRelicAgent.setMaxOfflineStorageSize(200);
+```
+
 
 
 

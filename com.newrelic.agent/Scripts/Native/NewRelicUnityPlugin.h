@@ -85,6 +85,8 @@ extern "C" {
 
     extern void NR_setMaxEventPoolSize(unsigned int size);
     extern void NR_setMaxEventBufferTime(unsigned int seconds);
+    extern void NR_setMaxOfflineStorageSize(unsigned int megabytes);
+
 
     extern bool NR_setAttributeStringValue(const char* name, const char* value);
     extern bool NR_setAttributeDoubleValue(const char* name, double value);
