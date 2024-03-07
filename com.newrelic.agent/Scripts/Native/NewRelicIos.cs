@@ -118,7 +118,10 @@ namespace NewRelic.Native
 		[DllImport("__Internal")]
 		private static extern void NR_setMaxEventBufferTime(uint seconds);
 
-		[DllImport("__Internal")]
+        [DllImport("__Internal")]
+        private static extern void NR_setMaxOfflineStorageSize(uint megabytes);
+
+        [DllImport("__Internal")]
 		private static extern bool NR_setAttributeStringValue(String name, String value);
 
 		[DllImport("__Internal")]
@@ -227,6 +230,15 @@ namespace NewRelic.Native
 			else
 			{
 				disableFeatures((int)NewRelicAgent.FeatureFlag.AnalyticsEvents);
+			}
+
+			if (plugin.offlineStorageEnabled)
+			{
+				enableFeatures((int)NewRelicAgent.FeatureFlag.OfflineStorage);
+			}
+			else
+			{
+				disableFeatures((int)NewRelicAgent.FeatureFlag.OfflineStorage);
 			}
 		}
 
@@ -389,6 +401,11 @@ namespace NewRelic.Native
 		override public void setMaxEventBufferTime(uint seconds)
 		{
 			NR_setMaxEventBufferTime(seconds);
+		}
+
+		override public void setMaxOfflineStorageSize(uint megabytes)
+		{
+            NR_setMaxOfflineStorageSize(megabytes);
 		}
 
 		override public bool setAttribute(string name, string value)

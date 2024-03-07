@@ -425,6 +425,10 @@ extern "C" {
         [NewRelic setMaxEventBufferTime:seconds];
     }
 
+     extern void NR_setMaxOfflineStorageSize(unsigned int megabytes){
+        [NewRelic setMaxOfflineStorageSize:megabytes];
+    }
+
     extern bool NR_setAttributeStringValue(const char* named, const char* value){
         NSString* nameString = named ? [NSString stringWithUTF8String:named]:nil;
         NSString* valueString = value ? [NSString stringWithUTF8String:value]:nil;
