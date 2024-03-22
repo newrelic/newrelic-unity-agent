@@ -1,3 +1,6 @@
+## 1.3.4
+
+- Upgraded native iOS Agent to 7.4.10
 
 ## 1.3.3
 
