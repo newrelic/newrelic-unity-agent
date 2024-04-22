@@ -300,6 +300,12 @@ If you would like to contribute to this project, review [these guidelines](./CON
 
 To all contributors, we thank you!  Without your contribution, this project would not be what it is today.  We also host a community project page dedicated to [Project Name](<LINK TO https://opensource.newrelic.com/projects/... PAGE>).
 
+## Support
+
+New Relic hosts and moderates an online forum where customers, users, maintainers, contributors, and New Relic employees can discuss and collaborate:
+
+[forum.newrelic.com](https://forum.newrelic.com/).
+
 ## License
 newrelic-unity-agent is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
 >[If applicable: newrelic-unity-agent also uses source code from third-party libraries. Full details on which libraries are used and the terms under which they are licensed can be found in the third-party notices document.]
