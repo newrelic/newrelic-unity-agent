@@ -217,6 +217,16 @@ See the examples below, and for more detail, see [New Relic IOS SDK doc](https:/
     NewRelicAgent.noticeHttpTransaction('https://github.com', 'GET', 200, DateTimeOffset.Now.ToUnixTimeMilliseconds(), DateTimeOffset.Now.ToUnixTimeMilliseconds()+1000, 100, 101, "response body",null);
 ```
 
+### [noticeNetworkFailure](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/notice-network-failure)(string url,string httpMethod,long startTime,long endTime,NewRelicAgent.NetworkFailureCode failureCode,string message): void; or (string url,string httpMethod,Timer timer,NewRelicAgent.NetworkFailureCode failureCode,string message): void; 
+> Records network failures. If a network request fails, use this method to record details about the failures. In most cases, place this call inside exception handlers, such as catch blocks.
+```C#
+    long startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    NewRelic.noticeNetworkFailure('https://github.com', 'GET', startTime, endTime, NewRelic.NetworkFailure.BadURL);
+
+    Timer timer = new();
+    NewRelic.noticeNetworkFailure('https://github.com', 'GET',timer , NewRelic.NetworkFailure.BadURL);
+```
+
 
 ### [recordMetric](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-android/android-sdk-api/recordmetric-android-sdk-api)(string name, string category,double value, NewRelicAgent.MetricUnit valueUnits,NewRelicAgent.MetricUnit countUnits): void;
 > Records custom metrics (arbitrary numerical data), where countUnit is the measurement unit of the metric count and valueUnit is the measurement unit for the metric value. If using countUnit or valueUnit, then all of value, countUnit, and valueUnit must all be set.

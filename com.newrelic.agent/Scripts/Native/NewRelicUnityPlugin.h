@@ -75,9 +75,15 @@ extern "C" {
                                        );
 
 
-    extern void NR_noticeNetworkFailure(const char* url,
+    extern void NR_noticeNetworkFailureWithTimer(const char* url,
                                         const char* httpMethod,
                                         NRTimer* timer,
+                                        int failureCode);
+
+      extern void NR_noticeNetworkFailure(const char* url,
+                                        const char* httpMethod,
+                                        long startTime,
+                                        long endTime,
                                         int failureCode);
 
     //Insights Events
