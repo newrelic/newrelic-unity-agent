@@ -381,6 +381,17 @@ namespace NewRelic.Native
             pluginInstance.CallStatic("noticeNetworkFailure", url, httpMethod, dateTimeToMillisSinceEpoch(timer.start), dateTimeToMillisSinceEpoch(timer.end), (int)failureCode, message);
         }
 
+       override public void noticeNetworkFailure(string url,
+                                         string httpMethod,
+                                         long startTime,
+                                         long endTime,
+                                         NewRelicAgent.NetworkFailureCode failureCode,
+                                         string message)
+        {
+            // Invoke the Android agent noticeNetworkFailure(url, httpMethod, startTime, endTime, exception)
+            pluginInstance.CallStatic("noticeNetworkFailure", url, httpMethod,startTime,endTime, (int)failureCode, message);
+        }
+
 
         // Insights Events
 

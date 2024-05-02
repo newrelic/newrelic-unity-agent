@@ -104,15 +104,22 @@ namespace NewRelic.Native
 		[DllImport("__Internal")]
 		private static extern void NR_noticeNetworkRequest(string url, string httpMethod, int statusCode, long startTime, long endTime, long bytesSent, long bytesReceived, string responseBody, System.IntPtr traceAttributes);
 		[DllImport("__Internal")]
-		private static extern void NR_noticeNetworkFailure(string url,
+		private static extern void NR_noticeNetworkFailureWithTimer(string url,
 															string httpMethod,
 															System.IntPtr timer,
 															int failureCode);
 
-		//Insights Events
+        [DllImport("__Internal")]
+        private static extern void NR_noticeNetworkFailure(string url,
+                                                    string httpMethod,
+                                                    long startTime,
+													long endTime,
+                                                    int failureCode);
+
+        //Insights Events
 
 
-		[DllImport("__Internal")]
+        [DllImport("__Internal")]
 		private static extern bool NR_setMaxEventPoolSize(uint size);
 
 		[DllImport("__Internal")]
@@ -383,17 +390,31 @@ namespace NewRelic.Native
 											NewRelicAgent.NetworkFailureCode failureCode,
 											string message)
 		{
-			NR_noticeNetworkFailure(url,
+            NR_noticeNetworkFailureWithTimer(url,
 									httpMethod,
 									timer.handle,
 									(int)failureCode);
 		}
 
+        override public void noticeNetworkFailure(string url,
+                                    string httpMethod,
+                                    long startTime,
+                                    long endTime,
+                                    NewRelicAgent.NetworkFailureCode failureCode,
+                                    string message)
+        {
+            NR_noticeNetworkFailure(url,
+                                    httpMethod,
+                                    startTime,
+									endTime,
+                                    (int)failureCode);
+        }
 
-		// Insights Events
+
+        // Insights Events
 
 
-		override public void setMaxEventPoolSize(uint size)
+        override public void setMaxEventPoolSize(uint size)
 		{
 			NR_setMaxEventPoolSize(size);
 		}

@@ -273,6 +273,13 @@ namespace NewRelic
                                          NewRelicAgent.NetworkFailureCode failureCode,
                                          string message);
 
+        abstract public void noticeNetworkFailure(string url,
+                                        string httpMethod,
+                                        long startTime,
+                                        long endTime,
+                                        NewRelicAgent.NetworkFailureCode failureCode,
+                                        string message);
+
 
         // Insights Events
 

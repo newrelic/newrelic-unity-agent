@@ -400,7 +400,7 @@ extern "C" {
        [NewRelic noticeNetworkRequestForURL:url httpMethod:httpMethodString startTime:startTime endTime:endTime responseHeaders:nil statusCode:httpStatusCode bytesSent:bytesSent bytesReceived:bytesSent responseData:data traceHeaders:traceAttributes andParams:nil];
     }
 
-    extern void NR_noticeNetworkFailure(const char* url,
+    extern void NR_noticeNetworkFailureWithTimer(const char* url,
                                         const char* httpMethod,
                                         NRTimer* timer,
                                         int failureCode) {
@@ -410,6 +410,22 @@ extern "C" {
         [NewRelic noticeNetworkFailureForURL:urlString?[NSURL URLWithString:urlString]:nil
                                   httpMethod:httpMethodString
                                    withTimer:timer
+                              andFailureCode:failureCode];
+
+    }
+
+  extern void NR_noticeNetworkFailure(const char* url,
+                                        const char* httpMethod,
+                                        long startTime,
+                                        long endTime,
+                                        int failureCode) {
+        NSString* urlString = url?[NSString stringWithUTF8String:url]:nil;
+        NSString* httpMethodString = httpMethod?[NSString stringWithUTF8String:httpMethod]:nil;
+
+        [NewRelic noticeNetworkFailureForURL:urlString?[NSURL URLWithString:urlString]:nil
+                                  httpMethod:httpMethodString
+                                  startTime:startTime
+                                  endTime:endTime
                               andFailureCode:failureCode];
 
     }

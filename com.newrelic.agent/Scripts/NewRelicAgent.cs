@@ -719,6 +719,27 @@ namespace NewRelic
             }
         }
 
+        /// <summary>
+        /// records a failed network transaction.
+        /// </summary>
+        /// <param name="url">the URL of the request</param>
+        /// <param name="httpMethod">HTTP method</param>
+        /// <param name="timer">a timer created when the network request was started</param>
+        /// <param name="failureCode">Failure code defined from <c>NewRelicAgent.NetworkFailureCode</c> list</param>
+        /// <param name="message">optional descriptive message, unused in iOS</param>
+        static public void NoticeNetworkFailure(string url,
+                                                 string httpMethod,
+                                                 long startTime,
+                                                 long endTime,
+                                                 NewRelicAgent.NetworkFailureCode failureCode,
+                                                 string message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.noticeNetworkFailure(url, httpMethod, startTime,endTime, failureCode, message);
+            }
+        }
+
 
         /// <summary>
         /// Sets the size of the max event pool.
