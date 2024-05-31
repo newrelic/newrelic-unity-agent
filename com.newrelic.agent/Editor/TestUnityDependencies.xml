@@ -5,7 +5,7 @@
         </androidPackage>
     </androidPackages>
     <iosPods>
-        <iosPod name="NewRelicAgent" version="~> 7.4.11" minTargetSdk="11.0">
+        <iosPod name="NewRelicAgent" version="~> 7.4.12" minTargetSdk="11.0">
             <sources>
                 <source>https://github.com/CocoaPods/Specs</source>
             </sources>

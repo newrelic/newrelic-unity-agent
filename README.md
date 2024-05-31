@@ -16,6 +16,7 @@ This agent utilizes the native New Relic Android and iOS agents to instrument Un
 * Scene Navigation as Interactions
 * Capture Native C++ Errors
 * offline monitoring of events and exceptions
+* Capture Background Events when app is in background
 
 ## Current Support:
 - Android API 24+ (AGP 7 and Higher)
