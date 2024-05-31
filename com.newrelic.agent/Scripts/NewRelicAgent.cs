@@ -72,7 +72,7 @@ namespace NewRelic
         /// <summary> Enable or disable Background Events Reporting When app is in background.
         ///  <c>true</c>
         /// </summary>
-        public Boolean backgroundReportingEnabled = true;
+        public Boolean backgroundReportingEnabled = false;
         
 
 
