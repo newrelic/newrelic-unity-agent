@@ -68,6 +68,13 @@ namespace NewRelic
         ///  <c>true</c>
         /// </summary>
         public Boolean offlineStorageEnabled = true;
+        
+        /// <summary> Enable or disable Background Events Reporting When app is in background.
+        ///  <c>true</c>
+        /// </summary>
+        public Boolean backgroundReportingEnabled = false;
+        
+
 
 #if UNITY_IPHONE
         /// <summary>
@@ -93,6 +100,11 @@ namespace NewRelic
         public Boolean URLSessionInstrumentation = true;
 
         public Boolean experimentalNetworkingInstrumentation = false;
+        
+        /// <summary> Enable or disable to use our new, more stable, event system for iOS agent.
+        ///  <c>true</c>
+        /// </summary>
+        public Boolean newEventSystemEnabled = true;
 #endif // UNITY_IPHONE
 
         protected NewRelic agentInstance = null;
@@ -115,8 +127,9 @@ namespace NewRelic
             HttpResponseBodyCapture = 1 << 5,   //
             AnalyticsEvents = 1 << 6,   //
             ExperimentalNetworkingInstrumentation = 1 << 13,    // iOS only: disabled by default
-            OfflineStorage = 1 << 21   // iOS only: enabled by default
-
+            OfflineStorage = 1 << 21,  // iOS only: enabled by default
+            NewEventSystem = 1 << 20, // iOS only:enabled by default
+            BackgroundReporting = 1 << 22 //disabled by default
         }
 
 

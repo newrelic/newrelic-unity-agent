@@ -247,6 +247,24 @@ namespace NewRelic.Native
 			{
 				disableFeatures((int)NewRelicAgent.FeatureFlag.OfflineStorage);
 			}
+
+            if (plugin.newEventSystemEnabled)
+			{
+				enableFeatures((int)NewRelicAgent.FeatureFlag.NewEventSystem);
+			}
+			else
+			{
+				disableFeatures((int)NewRelicAgent.FeatureFlag.NewEventSystem);
+			}
+
+            if (plugin.backgroundReportingEnabled)
+			{
+				enableFeatures((int)NewRelicAgent.FeatureFlag.BackgroundReporting);
+			}
+			else
+			{
+				disableFeatures((int)NewRelicAgent.FeatureFlag.BackgroundReporting);
+			}
 		}
 
 		public void logLevel(int logLevel)
