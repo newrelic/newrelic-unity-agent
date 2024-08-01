@@ -500,9 +500,33 @@ extern "C" {
     }
 
 
-     extern bool NR_setUserId(const char* userId){
-        return [NewRelic setUserId:[NSString stringWithUTF8String:userId]];
-    }
+          extern bool NR_setUserId(const char* userId){
+             return [NewRelic setUserId:[NSString stringWithUTF8String:userId]];
+             }
+    
+        extern void NR_logInfo(const char* message){
+            [NewRelic logInfo:[NSString stringWithUTF8String:message]];
+        }
+    
+        extern void NR_logError(const char* message){
+             [NewRelic logError:[NSString stringWithUTF8String:message]];
+        }
+    
+        extern void NR_logWarning(const char* message){
+             [NewRelic logWarning:[NSString stringWithUTF8String:message]];
+        }
+    
+        extern void NR_logVerbose(const char* message){
+             [NewRelic logVerbose:[NSString stringWithUTF8String:message]];
+        }
+    
+        extern void NR_logDebug(const char* message){
+             [NewRelic logDebug:[NSString stringWithUTF8String:message]];
+        }
+    
+        extern void NR_logAttributes(NSDictionary* attributes){
+            [NewRelic logAttributes:attributes];
+        }
 
 #ifdef __cplusplus
 }

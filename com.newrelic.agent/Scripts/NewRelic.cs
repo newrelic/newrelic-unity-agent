@@ -300,7 +300,7 @@ namespace NewRelic
         abstract public bool removeAllAttributes();
 
         abstract public void recordHandleException(Exception exception);
-
+        
         abstract public bool recordBreadcrumb(string name, Dictionary<string, object> attributes);
 
         abstract public bool recordCustomEvent(string eventName, Dictionary<string, object> attributes);
@@ -310,6 +310,20 @@ namespace NewRelic
         abstract public bool setUserId(string userId);
 
         abstract public void setMaxOfflineStorageSize(uint megabytes);
+        
+        abstract public void LogInfo(String message);
+
+        abstract public void LogError(String message);
+
+        abstract public void LogVerbose(String message);
+
+        abstract public void LogWarning(String message);
+        
+        abstract public void LogDebug(String message);
+        
+        abstract public void Log(NewRelicAgent.AgentLogLevel level, String message);
+        
+        abstract public void LogAttributes(Dictionary<string, object> attributes);
 
 
 
