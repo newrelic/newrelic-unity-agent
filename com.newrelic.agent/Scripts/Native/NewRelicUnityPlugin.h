@@ -113,6 +113,18 @@ extern "C" {
 
     extern bool NR_setUserId(const char* userId);
 
+    extern void NR_logInfo(const char* message);
+
+    extern void NR_logError(const char* message);
+
+    extern void NR_logWarning(const char* message);
+
+    extern void NR_logVerbose(const char* message);
+
+    extern void NR_logDebug(const char* message);
+
+    extern void NR_logAttributes(NSDictionary* attributes);
+
     extern void NR_NewRelic_crash();
 #ifdef __cplusplus
 }

@@ -160,6 +160,28 @@ namespace NewRelic.Native
 
 		[DllImport("__Internal")]
 		private static extern void NR_recordHandledExceptionWithStackTrace(System.IntPtr attributes);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logInfo(string message);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logError(string message);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logWarning(string message);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logVerbose(string message);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logDebug(string message);
+		
+		[DllImport("__Internal")]
+		private static extern void NR_logAttributes(System.IntPtr nSDict);
+		
+
+		
+		
 
 		public void useSSL(bool useSSL)
 		{
@@ -486,6 +508,7 @@ namespace NewRelic.Native
 		{
 			logMessageHandler(exception.Message, exception.StackTrace, LogType.Exception);
 		}
+		
 
 		override public bool recordBreadcrumb(string name, Dictionary<string, object> attributes)
 		{
@@ -600,9 +623,9 @@ namespace NewRelic.Native
 
 				NR_dictionaryInsertString(attributes, "log", logString);
 				NR_dictionaryInsertString(attributes, "stacktrace", stackTrace);
-				NR_dictionaryInsertString(attributes, "logType", type.ToString());
+				NR_dictionaryInsertString(attributes, "logLevel", type.ToString());
 
-				NR_recordCustomEvent("Mobile Unity Logs", attributes);
+				NR_logAttributes(attributes);
 
 			}
 		}
@@ -701,6 +724,65 @@ namespace NewRelic.Native
 			System.IntPtr NSDict = CreateNSDictionaryFromDictionary(dtHeaders);
 			NR_noticeNetworkRequest(url, httpMethod, statusCode, startTime, endTime, bytesSent, bytesReceived, responseBody, NSDict);
 
+		}
+		
+		public override void LogInfo(string message)
+		{
+			NR_logInfo(message);
+
+		}
+
+		public override void LogError(string message)
+		{
+			NR_logError(message);
+		}
+
+		public override void LogVerbose(string message)
+		{
+			NR_logVerbose(message);
+		}
+
+		public override void LogWarning(string message)
+		{
+			NR_logWarning(message);
+		}
+
+		public override void LogDebug(string message)
+		{
+			NR_logDebug(message);
+		}
+
+		public override void Log(NewRelicAgent.AgentLogLevel level, string message)
+		{
+			String logLevel = "INFO";
+            
+			if(level == NewRelicAgent.AgentLogLevel.ERROR)
+			{
+				logLevel = "ERROR";
+			}
+			else if(level == NewRelicAgent.AgentLogLevel.VERBOSE)
+			{
+				logLevel = "VERBOSE";
+			}
+			else if(level == NewRelicAgent.AgentLogLevel.WARNING)
+			{
+				logLevel = "WARNING";
+			}
+			else if(level == NewRelicAgent.AgentLogLevel.DEBUG)
+			{
+				logLevel = "DEBUG";
+			}
+            
+			Dictionary<string,object> attributes = new Dictionary<string, object>();
+			attributes.Add("logLevel",logLevel);
+			attributes.Add("message",message);
+			LogAttributes(attributes);
+		}
+
+		public override void LogAttributes(Dictionary<string, object> attributes)
+		{
+			System.IntPtr NSDict = CreateNSDictionaryFromDictionary(attributes);
+			NR_logAttributes(NSDict);
 		}
 	}
 

@@ -68,12 +68,12 @@ namespace NewRelic
         ///  <c>true</c>
         /// </summary>
         public Boolean offlineStorageEnabled = true;
-        
+
         /// <summary> Enable or disable Background Events Reporting When app is in background.
         ///  <c>true</c>
         /// </summary>
         public Boolean backgroundReportingEnabled = false;
-        
+
 
 
 #if UNITY_IPHONE
@@ -100,7 +100,7 @@ namespace NewRelic
         public Boolean URLSessionInstrumentation = true;
 
         public Boolean experimentalNetworkingInstrumentation = false;
-        
+
         /// <summary> Enable or disable to use our new, more stable, event system for iOS agent.
         ///  <c>true</c>
         /// </summary>
@@ -970,6 +970,93 @@ namespace NewRelic
                 instance.agentInstance.setMaxOfflineStorageSize(megabytes);
             }
         }
+
+
+        /// <summary>
+        /// Logs an informational message.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        static public void LogInfo(String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogInfo(message);
+            }
+        }
+
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        static public void LogError(String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogError(message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a verbose message.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        static public void LogVerbose(String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogVerbose(message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a warning message.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        static public void LogWarning(String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogWarning(message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a debug message.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        static public void LogDebug(String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogDebug(message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a message with a specified log level.
+        /// </summary>
+        /// <param name="level">The log level.</param>
+        /// <param name="message">The message to log.</param>
+        static public void Log(NewRelicAgent.AgentLogLevel level, String message)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.Log(level, message);
+            }
+        }
+
+        /// <summary>
+        /// Logs a set of attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes to log.</param>
+        static public void LogAttributes(Dictionary<string, object> attributes)
+        {
+            if (validatePluginImpl())
+            {
+                instance.agentInstance.LogAttributes(attributes);
+            }
+        }
+
 
 
     }

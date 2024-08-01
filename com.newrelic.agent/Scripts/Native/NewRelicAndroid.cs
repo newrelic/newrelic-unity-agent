@@ -196,6 +196,15 @@ namespace NewRelic.Native
                     agentInstance.CallStatic("disableFeature", OfflineStorage);
 
                 }
+                AndroidJavaObject BackgroundReporting = featureFlags.GetStatic<AndroidJavaObject>("BackgroundReporting");
+
+                if (plugin.backgroundReportingEnabled)
+                {
+                    agentInstance.CallStatic("enableFeature", BackgroundReporting);
+                } else
+                {
+                    agentInstance.CallStatic("enableFeature", BackgroundReporting);
+                }
 
                 // finally, start the agent
                 agentInstance.Call("start", this.activityContext);
@@ -519,7 +528,8 @@ namespace NewRelic.Native
         {
             logMessageHandler(exception.Message, exception.StackTrace, LogType.Exception);
         }
-
+        
+        
         public static void logMessageHandler(string logString, string stackTrace, LogType type)
         {
             if (type == LogType.Exception)
@@ -554,7 +564,7 @@ namespace NewRelic.Native
                 if (pluginInstance != null)
                 {
                     Dictionary<string, object> attributes = new Dictionary<string, object>();
-                    attributes.Add("logType", type.ToString());
+                    attributes.Add("level", type.ToString());
                     attributes.Add("log", logString);
                     if (stackTrace.Length > 0)
                     {
@@ -580,7 +590,7 @@ namespace NewRelic.Native
                         }
                     }
 
-                    pluginInstance.CallStatic<Boolean>("recordCustomEvent", "Mobile Unity Logs", mapInstance);
+                    pluginInstance.CallStatic("logAttributes", mapInstance);
                 }
 
 
@@ -715,6 +725,65 @@ namespace NewRelic.Native
         public override void setMaxOfflineStorageSize(uint megabytes)
         {
             pluginInstance.CallStatic("setMaxOfflineStorageSize", megabytes);
+        }
+
+        public override void LogInfo(string message)
+        {
+            pluginInstance.CallStatic("logInfo", message);
+
+        }
+
+        public override void LogError(string message)
+        {
+            pluginInstance.CallStatic("logError", message);
+        }
+
+        public override void LogVerbose(string message)
+        {
+            pluginInstance.CallStatic("logVerbose", message);
+        }
+
+        public override void LogWarning(string message)
+        {
+            pluginInstance.CallStatic("logWarning", message);
+        }
+
+        public override void LogDebug(string message)
+        {
+            pluginInstance.CallStatic("logDebug", message);
+        }
+
+        public override void Log(NewRelicAgent.AgentLogLevel level, string message)
+        {
+            String logLevel = "INFO";
+            
+            if(level == NewRelicAgent.AgentLogLevel.ERROR)
+            {
+                logLevel = "ERROR";
+            }
+            else if(level == NewRelicAgent.AgentLogLevel.VERBOSE)
+            {
+                logLevel = "VERBOSE";
+            }
+            else if(level == NewRelicAgent.AgentLogLevel.WARNING)
+            {
+                logLevel = "WARNING";
+            }
+            else if(level == NewRelicAgent.AgentLogLevel.DEBUG)
+            {
+                logLevel = "DEBUG";
+            }
+            
+            Dictionary<string,object> attributes = new Dictionary<string, object>();
+            attributes.Add("level",logLevel);
+            attributes.Add("message",message);
+            LogAttributes(attributes);
+        }
+
+        public override void LogAttributes(Dictionary<string, object> attributes)
+        {
+            AndroidJavaObject javaMap = CreateJavaMapFromDictionary(attributes);
+            pluginInstance.CallStatic("logAttributes", javaMap);
         }
     }
 }
