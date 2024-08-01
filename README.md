@@ -57,7 +57,7 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
 dependencies {
     implementation project(':unityLibrary')
     implementation 'com.newrelic.agent.android:agent-ndk:1.+' 
-    implementation 'com.newrelic.agent.android:android-agent:7.2.0' 
+    implementation 'com.newrelic.agent.android:android-agent:7.5.0' 
     }
 
 android {
@@ -89,7 +89,7 @@ android {
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
-            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.3.0'
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.5.0'
             **BUILD_SCRIPT_DEPS**
         }
     }
@@ -273,8 +273,54 @@ See the examples below, and for more detail, see [New Relic IOS SDK doc](https:/
     NewRelicAgent.setMaxOfflineStorageSize(200);
 ```
 
+### LogInfo(String message) : void
 
+> Logs an informational message to the New Relic log.
+``` C#
+    NewRelicAgent.LogInfo("This is an informational message");
+```
 
+### LogError(String message) : void
+> Logs an error message to the New Relic log.
+``` C#
+    NewRelicAgent.LogError("This is an error message");
+```
+### LogVerbose(String message) : void
+> Logs a verbose message to the New Relic log.
+``` C#
+    NewRelicAgent.LogVerbose("This is a verbose message");
+```
+
+### LogWarning(String message) : void
+> Logs a warning message to the New Relic log.
+``` C#
+    NewRelicAgent.LogWarning("This is a warning message");
+```
+
+### LogDebug(String message) : void
+> Logs a debug message to the New Relic log.
+``` C#
+    NewRelicAgent.LogDebug("This is a debug message");
+```
+
+### Log(NewRelicAgent.AgentLogLevel level, String message) : void
+> Logs a message to the New Relic log with a specified log level.
+``` C#
+    NewRelicAgent.LogNewRelic.NewRelicAgent.AgentLogLevel.INFO, "This is an informational message");
+``` 
+
+### LogAttributes(Dictionary<string, object> attributes) : void
+> Logs a message with attributes to the New Relic log.
+``` C#
+    NewRelicAgent.LogAttributes(new Dictionary<string, object>()
+        {
+            {"BreadNumValue", 12.3 },
+            {"BreadStrValue", "UnityBread" },
+            {"BreadBoolValue", true },
+            {"message", "This is a message with attributes" }
+        }
+    );
+```
 
 ## How to see C# Errors(Fatal/Non Fatal) in NewRelic One?
 
