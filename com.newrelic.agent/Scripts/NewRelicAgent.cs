@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine.SceneManagement;
+using System.Collections;
 #if UNITY_IPHONE || UNITY_ANDROID
 using NewRelic.Native;
 #endif
@@ -749,7 +750,7 @@ namespace NewRelic
         {
             if (validatePluginImpl())
             {
-                instance.agentInstance.noticeNetworkFailure(url, httpMethod, startTime,endTime, failureCode, message);
+                instance.agentInstance.noticeNetworkFailure(url, httpMethod, startTime, endTime, failureCode, message);
             }
         }
 
@@ -1041,9 +1042,12 @@ namespace NewRelic
         {
             if (validatePluginImpl())
             {
+                String logLevel = LogLevelString(level);
                 instance.agentInstance.Log(level, message);
             }
         }
+
+
 
         /// <summary>
         /// Logs a set of attributes.
@@ -1053,11 +1057,50 @@ namespace NewRelic
         {
             if (validatePluginImpl())
             {
+
+
+
+                if ((attributes.ContainsKey("level") && attributes.GetValueOrDefault("level").GetType() == typeof(AgentLogLevel)))
+                {
+                    attributes["level"] = LogLevelString((AgentLogLevel)attributes.GetValueOrDefault("level"));
+                }
+
+
+
                 instance.agentInstance.LogAttributes(attributes);
             }
         }
 
 
+        public static String LogLevelString(AgentLogLevel agentLogLevel)
+        {
 
+            String logLevel = "INFO";
+
+            if (agentLogLevel.Equals(AgentLogLevel.DEBUG))
+            {
+                logLevel = "DEBUG";
+            }
+            else if (agentLogLevel.Equals(AgentLogLevel.ERROR))
+            {
+                logLevel = "ERROR";
+            }
+            else if (agentLogLevel.Equals(AgentLogLevel.INFO))
+            {
+                logLevel = "INFO";
+            }
+            else if (agentLogLevel.Equals(AgentLogLevel.VERBOSE))
+            {
+                logLevel = "VERBOSE";
+            }
+            else if (agentLogLevel.Equals(AgentLogLevel.WARNING))
+            {
+                logLevel = "WARN";
+            }
+
+
+
+            return logLevel;
+        }
     }
 }
