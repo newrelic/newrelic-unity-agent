@@ -621,9 +621,9 @@ namespace NewRelic.Native
 				var attributes = NR_dictionaryCreate();
 
 
-				NR_dictionaryInsertString(attributes, "log", logString);
+				NR_dictionaryInsertString(attributes, "message", logString);
 				NR_dictionaryInsertString(attributes, "stacktrace", stackTrace);
-				NR_dictionaryInsertString(attributes, "logLevel", type.ToString());
+				NR_dictionaryInsertString(attributes, "logLevel", ConvertUnityLogTypesToNewRelicLogType(type));
 
 				NR_logAttributes(attributes);
 
@@ -784,6 +784,29 @@ namespace NewRelic.Native
 			System.IntPtr NSDict = CreateNSDictionaryFromDictionary(attributes);
 			NR_logAttributes(NSDict);
 		}
+
+		static String ConvertUnityLogTypesToNewRelicLogType(LogType type)
+        {
+            String logLevel = "INFO";
+
+            if (type.Equals(LogType.Assert))
+            {
+                logLevel = "VERBOSE";
+            }else if (type.Equals(LogType.Log))
+            {
+                logLevel = "INFO";
+            }
+            else if (type.Equals(LogType.Warning))
+            {
+                logLevel = "WARN";
+            }
+            else if (type.Equals(LogType.Error))
+            {
+                logLevel = "ERROR";
+            }
+
+            return logLevel;
+        }
 	}
 
 	internal class StackFrame
