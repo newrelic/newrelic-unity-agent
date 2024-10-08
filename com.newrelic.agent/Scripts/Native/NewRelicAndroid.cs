@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NewRelic.Utilities;
 using UnityEngine;
+using static NewRelic.NewRelicAgent;
 
 namespace NewRelic.Native
 {
@@ -564,8 +565,8 @@ namespace NewRelic.Native
                 if (pluginInstance != null)
                 {
                     Dictionary<string, object> attributes = new Dictionary<string, object>();
-                    attributes.Add("level", type.ToString());
-                    attributes.Add("log", logString);
+                    attributes.Add("level", ConvertUnityLogTypesToNewRelicLogType(type));
+                    attributes.Add("message", logString);
                     if (stackTrace.Length > 0)
                     {
                         attributes.Add("stacktrace", stackTrace);
@@ -785,7 +786,32 @@ namespace NewRelic.Native
             AndroidJavaObject javaMap = CreateJavaMapFromDictionary(attributes);
             pluginInstance.CallStatic("logAttributes", javaMap);
         }
+
+        static String ConvertUnityLogTypesToNewRelicLogType(LogType type)
+        {
+            String logLevel = "INFO";
+
+            if (type.Equals(LogType.Assert))
+            {
+                logLevel = "VERBOSE";
+            }else if (type.Equals(LogType.Log))
+            {
+                logLevel = "INFO";
+            }
+            else if (type.Equals(LogType.Warning))
+            {
+                logLevel = "WARN";
+            }
+            else if (type.Equals(LogType.Error))
+            {
+                logLevel = "ERROR";
+            }
+
+            return logLevel;
+        }
     }
+
+
 }
 
 #endif
