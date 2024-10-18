@@ -1,3 +1,10 @@
+## 1.4.2
+
+
+## Improvements
+
+- Native Android agent updated to version 7.6.1
+
 ## 1.4.1
 
 
