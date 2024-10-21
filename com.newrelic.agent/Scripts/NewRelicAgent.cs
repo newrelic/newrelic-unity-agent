@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine.SceneManagement;
 using System.Collections;
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID
 using NewRelic.Native;
 #endif
 using NewRelic.Networking;
@@ -340,7 +340,7 @@ namespace NewRelic
 
 #endif
 
-#if (UNITY_IOS)
+#if (UNITY_IOS && !UNITY_EDITOR)
             NewRelicIos.logMessageHandler(condition, stackTrace, type);
 #endif
 
@@ -365,7 +365,7 @@ namespace NewRelic
 		        UnityEngine.Debug.Log ("UnhandledExceptionEventHandler installed");
 #endif // UNITY_ANDROID
 
-#if (UNITY_IOS)
+#if (UNITY_IOS && !UNITY_EDITOR)
             Application.logMessageReceived += NewRelicIos.logMessageHandler;
 #endif
         }
@@ -383,7 +383,7 @@ namespace NewRelic
 		        UnityEngine.Debug.Log ("UnhandledExceptionEventHandler removed");
 #endif // UNITY_ANDROID
 
-#if (UNITY_IOS)
+#if (UNITY_IOS && !UNITY_EDITOR)
             Application.logMessageReceived -= NewRelicIos.logMessageHandler;
 #endif
         }
