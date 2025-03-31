@@ -89,7 +89,7 @@ android {
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
-            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.6.4'
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.6.5'
             **BUILD_SCRIPT_DEPS**
         }
     }
