@@ -1,7 +1,7 @@
 <dependencies>
     <androidPackages>
         <androidPackage spec="com.newrelic.agent.android:agent-ndk:1.1.1"></androidPackage>
-        <androidPackage spec="com.newrelic.agent.android:android-agent:7.6.4">
+        <androidPackage spec="com.newrelic.agent.android:android-agent:7.6.5">
         </androidPackage>
     </androidPackages>
     <iosPods>
