@@ -1,11 +1,11 @@
 <dependencies>
     <androidPackages>
         <androidPackage spec="com.newrelic.agent.android:agent-ndk:1.1.1"></androidPackage>
-        <androidPackage spec="com.newrelic.agent.android:android-agent:7.6.5">
+        <androidPackage spec="com.newrelic.agent.android:android-agent:7.6.6">
         </androidPackage>
     </androidPackages>
     <iosPods>
-        <iosPod name="NewRelicAgent" version="~> 7.5.4" minTargetSdk="11.0">
+        <iosPod name="NewRelicAgent" version="~> 7.5.5" minTargetSdk="11.0">
             <sources>
                 <source>https://github.com/CocoaPods/Specs</source>
             </sources>
