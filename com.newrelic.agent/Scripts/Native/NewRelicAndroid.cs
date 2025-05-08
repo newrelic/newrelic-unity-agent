@@ -138,7 +138,7 @@ namespace NewRelic.Native
 
             using (AndroidJavaObject platform = new AndroidJavaClass("com.newrelic.agent.android.ApplicationFramework").GetStatic<AndroidJavaObject>("Unity"))
             {
-                agentInstance.Call<AndroidJavaObject>("withApplicationFramework", platform, "1.4.6");
+                agentInstance.Call<AndroidJavaObject>("withApplicationFramework", platform, "1.4.7");
             }
 
 
