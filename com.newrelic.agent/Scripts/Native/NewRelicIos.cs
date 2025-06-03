@@ -656,8 +656,18 @@ namespace NewRelic.Native
 						string[] splits = methodName.Split(".".ToCharArray());
 						if (splits != null && splits.Length > 1)
 						{
-							className = splits[0];
-							methodName = splits[1];
+							 if (splits.Length > 2)
+                                {
+                                    // For methods with namespace paths (e.g. My.Name.Hoge.NewBehaviourScript.Click)
+                                    // Extract everything except the last part as className
+                                    className = string.Join(".", splits, 0, splits.Length - 1);
+                                    methodName = splits[splits.Length - 1];
+                                }
+                                else
+                                {
+                                    className = splits[0];
+                                    methodName = splits[1];
+                                }
 						}
 					}
 
