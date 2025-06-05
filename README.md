@@ -111,21 +111,15 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
  ```
   By making these changes in your Gradle files, you will ensure that the New Relic artifacts are properly downloaded and included in your Unity project.
 
-6.Make sure your app requests INTERNET and ACCESS_NETWORK_STATE permissions by adding these lines to your AndroidManifest.xml
 
- ``` xml
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  ```
-
-7. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
+6. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
 
    1. Add use_frameworks! to Podfile is unchecked.
    2. Always add the main target to Podfile box is checked.
 
   <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
 
-8. If the Podfile is not being used for iOS dependency management, you can proceed with the following steps.
+7. If the Podfile is not being used for iOS dependency management, you can proceed with the following steps.
 
    1. Download and unzip the New Relic XCFramework SDK
     Download the latest iOS agent from our [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes)
