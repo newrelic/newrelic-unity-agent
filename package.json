@@ -1,6 +1,6 @@
 {
   "name": "com.newrelic.agent",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "displayName": "NewRelic SDK",
   "description": "NewRelic's Unity SDK lets you bring the deep, introspective and native debugging power of NewRelic into your Unity game or application.",
   "unity": "2019.1",
