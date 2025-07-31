@@ -1,3 +1,17 @@
+
+## 1.4.9
+
+## Improvements
+- Native Android agent updated to version 7.6.8
+- Native iOS agent updated to version 7.5.8
+- fixed Unity Exception stack traces issue when namespaces are used.
+
+## 1.4.8
+
+## Improvements
+- Native Android agent updated to version 7.6.7
+- Native iOS agent updated to version 7.5.6
+
 ## 1.4.7
 
 ## Improvements
