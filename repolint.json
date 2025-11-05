@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/newrelic-forks/repolinter/master/rulesets/schema.json",
+  "version": 2,
+  "axioms": {},
+  "extends": "https://raw.githubusercontent.com/newrelic/.github/main/repolinter-rulesets/community-project.yml",
+  "rules": {
+    "readme-starts-with-community-header": {
+      "level": "error",
+      "rule": {
+        "type": "file-starts-with",
+        "options": {
+          "globsAll": [
+            "README.md"
+          ],
+          "nocase": false,
+          "lineCount": 5,
+          "patterns": [
+            "<a href=\"https:\\/\\/opensource\\.newrelic\\.com\\/oss-category\\/#community-project\"><picture><source media=\"\\(prefers-color-scheme: dark\\)\" srcset=\"https:\\/\\/github\\.com\\/newrelic\\/opensource-website\\/raw\\/main\\/src\\/images\\/categories\\/dark\\/Community_Project\\.png\"><source media=\"\\(prefers-color-scheme: light\\)\" srcset=\"https:\\/\\/github\\.com\\/newrelic\\/opensource-website\\/raw\\/main\\/src\\/images\\/categories\\/Community_Project\\.png\"><img alt=\"New Relic Open Source community project banner\\.\" src=\"https:\\/\\/github\\.com\\/newrelic\\/opensource-website\\/raw\\/main\\/src\\/images\\/categories\\/Community_Project\\.png\"><\\/picture><\\/a>",
+            "https:\\/\\/opensource\\.newrelic\\.com\\/oss-category\\/#community-project"
+          ],
+          "human-readable-pattern": "Open source Community header (see https://opensource.newrelic.com/oss-category)",
+          "flags": "i",
+          "succeed-on-non-existent": false
+        }
+      }
+    },
+    "readme-contains-link-to-security-policy": {
+      "level": "error",
+      "rule": {
+        "type": "file-contents",
+        "options": {
+          "globsAll": [
+            "README.md"
+          ],
+          "fail-on-non-existent": true,
+          "flags": "i",
+          "content": "(?:(?:https:\\/\\/github\\.com\\/newrelic\\/[^\\/]+)|(?:\\.\\.\\/\\.\\.))\\/security\\/policy",
+          "human-readable-content": "a link to the security policy for this repository"
+        }
+      }
+    },
+    "readme-contains-forum-topic": {
+      "level": "error",
+      "rule": {
+        "type": "file-contents",
+        "options": {
+          "globsAll": [
+            "README.md"
+          ],
+          "fail-on-non-existent": false,
+          "flags": "i",
+          "content": "forum\\.newrelic\\.com",
+          "human-readable-content": "a link to the appropriate forum.newrelic.com topic"
+        }
+      }
+    }
+  }
+}
