@@ -1,0 +1,294 @@
+name: Create Release on Version Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+
+jobs:
+  check-version-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Get current version from package.json
+        id: current_version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists"
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Tag v$VERSION does not exist"
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get previous version tag
+        id: previous_version
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          # Get the most recent tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # If no previous tag, get first commit
+            PREVIOUS_REF=$(git rev-list --max-parents=0 HEAD)
+            echo "previous_tag=" >> $GITHUB_OUTPUT
+            echo "previous_ref=$PREVIOUS_REF" >> $GITHUB_OUTPUT
+            echo "No previous tag found, using first commit: $PREVIOUS_REF"
+          else
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            echo "previous_ref=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            echo "Previous tag: $PREVIOUS_TAG"
+          fi
+
+      - name: Get commits since last tag
+        id: commits
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          PREVIOUS_REF="${{ steps.previous_version.outputs.previous_ref }}"
+
+          if [ -z "$PREVIOUS_REF" ]; then
+            PREVIOUS_REF="HEAD~10"
+          fi
+
+          # Get commit messages since last tag
+          COMMITS=$(git log ${PREVIOUS_REF}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+
+          # Save to file to handle multiline
+          echo "$COMMITS" > commits.txt
+
+          echo "Commits since last release:"
+          cat commits.txt
+
+      - name: Extract PR numbers and get PR details
+        id: pr_details
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          PREVIOUS_REF="${{ steps.previous_version.outputs.previous_ref }}"
+
+          if [ -z "$PREVIOUS_REF" ]; then
+            PREVIOUS_REF="HEAD~10"
+          fi
+
+          # Get merge commits with PR numbers
+          MERGE_COMMITS=$(git log ${PREVIOUS_REF}..HEAD --merges --pretty=format:"%s" | grep -oP '#\K[0-9]+' || echo "")
+
+          PR_DETAILS=""
+
+          if [ -n "$MERGE_COMMITS" ]; then
+            echo "Found PR numbers: $MERGE_COMMITS"
+
+            for PR_NUM in $MERGE_COMMITS; do
+              echo "Fetching details for PR #$PR_NUM"
+
+              # Get PR details using GitHub API
+              PR_INFO=$(gh pr view $PR_NUM --json title,author,url,body 2>/dev/null || echo "")
+
+              if [ -n "$PR_INFO" ]; then
+                PR_TITLE=$(echo "$PR_INFO" | jq -r '.title')
+                PR_AUTHOR=$(echo "$PR_INFO" | jq -r '.author.login')
+                PR_URL=$(echo "$PR_INFO" | jq -r '.url')
+
+                PR_DETAILS="${PR_DETAILS}\n- **PR #${PR_NUM}**: ${PR_TITLE} by @${PR_AUTHOR} - [View PR](${PR_URL})"
+              else
+                PR_DETAILS="${PR_DETAILS}\n- **PR #${PR_NUM}**"
+              fi
+            done
+          fi
+
+          # Save PR details to file
+          echo -e "$PR_DETAILS" > pr_details.txt
+
+          echo "PR Details:"
+          cat pr_details.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version changes from CHANGELOG
+        id: changelog
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+
+          # Extract the section for current version from CHANGELOG.md
+          CHANGELOG_SECTION=$(awk "/^## $VERSION\$/,/^## [0-9]/" CHANGELOG.md | sed '$d' | tail -n +2)
+
+          if [ -z "$CHANGELOG_SECTION" ]; then
+            echo "No changelog entry found for version $VERSION"
+            CHANGELOG_SECTION="No changelog entry found."
+          fi
+
+          # Save to file
+          echo "$CHANGELOG_SECTION" > changelog_section.txt
+
+          echo "Changelog for $VERSION:"
+          cat changelog_section.txt
+
+      - name: Generate release notes
+        id: release_notes
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+          PREVIOUS_TAG="${{ steps.previous_version.outputs.previous_tag }}"
+
+          # Start building release notes
+          cat > release_notes.md <<'EOF'
+          # Release v$VERSION
+
+          EOF
+
+          # Add changelog section
+          echo "## What's Changed" >> release_notes.md
+          echo "" >> release_notes.md
+
+          if [ -f changelog_section.txt ]; then
+            cat changelog_section.txt >> release_notes.md
+          fi
+
+          echo "" >> release_notes.md
+
+          # Add PR details if available
+          if [ -f pr_details.txt ] && [ -s pr_details.txt ]; then
+            echo "## Pull Requests Merged" >> release_notes.md
+            echo "" >> release_notes.md
+            cat pr_details.txt >> release_notes.md
+            echo "" >> release_notes.md
+          fi
+
+          # Add commit history
+          echo "## Commits" >> release_notes.md
+          echo "" >> release_notes.md
+
+          if [ -f commits.txt ]; then
+            cat commits.txt >> release_notes.md
+          fi
+
+          echo "" >> release_notes.md
+
+          # Add footer
+          cat >> release_notes.md <<'EOF'
+
+          ---
+
+          ## Installation
+
+          To install or update to this version:
+
+          ### Via Unity Package Manager
+
+          1. In Unity, go to **Window > Package Manager**
+          2. Click the **+** button and select **Add package from git URL**
+          3. Enter: `https://github.com/newrelic/newrelic-unity-agent.git#v$VERSION`
+
+          ### Requirements
+
+          - **Unity**: 2019.1 or later
+          - **Android**: API 24+ (AGP 7 and Higher)
+          - **iOS**: iOS 10 or later
+
+          ## Documentation
+
+          - [Installation Guide](https://github.com/newrelic/newrelic-unity-agent#installation)
+          - [Usage Documentation](https://github.com/newrelic/newrelic-unity-agent#usage)
+          - [New Relic Unity Docs](https://docs.newrelic.com/docs/mobile-monitoring/new-relic-mobile-unity/monitor-your-unity-application/)
+
+          ---
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...v$VERSION
+          EOF
+
+          # Replace $VERSION placeholder
+          sed -i "s/\$VERSION/$VERSION/g" release_notes.md
+
+          # Replace $PREVIOUS_TAG placeholder
+          if [ -n "$PREVIOUS_TAG" ]; then
+            sed -i "s|\$PREVIOUS_TAG|$PREVIOUS_TAG|g" release_notes.md
+          else
+            # Remove the Full Changelog line if no previous tag
+            sed -i '/Full Changelog:/d' release_notes.md
+          fi
+
+          echo "Generated release notes:"
+          cat release_notes.md
+
+      - name: Create Git Tag
+        id: create_tag
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "gh-actions-${GITHUB_ACTOR}@github.com"
+
+          # Create annotated tag
+          git tag -a "v$VERSION" -m "Release version $VERSION"
+
+          # Push tag to remote
+          git push origin "v$VERSION"
+
+          echo "Created and pushed tag v$VERSION"
+
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+
+          # Create release using gh CLI
+          gh release create "v$VERSION" \
+            --title "Release v$VERSION" \
+            --notes-file release_notes.md \
+            --target main
+
+          echo "Created GitHub release for v$VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+
+          echo "## Release Created Successfully! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: v$VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: \`v$VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL**: https://github.com/${{ github.repository }}/releases/tag/v$VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Notes Preview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat release_notes.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Tag Already Exists
+        if: steps.check_tag.outputs.tag_exists == 'true'
+        run: |
+          VERSION="${{ steps.current_version.outputs.version }}"
+
+          echo "## Tag Already Exists ℹ️" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Tag \`v$VERSION\` already exists. No new release created." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "If you need to update the release, please:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Delete the existing tag and release" >> $GITHUB_STEP_SUMMARY
+          echo "2. Re-run this workflow" >> $GITHUB_STEP_SUMMARY
