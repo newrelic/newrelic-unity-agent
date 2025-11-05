@@ -20,7 +20,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-------------------------- ExternalDepedencyManager-----------------------------------------
+------------------------- ExternalDependencyManager-----------------------------------------
 Copyright (C) 2014 Google Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
