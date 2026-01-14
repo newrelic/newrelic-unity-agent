@@ -223,91 +223,29 @@ jobs:
 
           echo "Updated CHANGELOG.md"
 
-      - name: Setup GitHub Credentials
-        if: steps.check_updates.outputs.needs_update == 'true'
-        run: |
-          git config user.name $GITHUB_ACTOR
-          git config user.email gh-actions-${GITHUB_ACTOR}@github.com
-
       - name: Create Pull Request
         if: steps.check_updates.outputs.needs_update == 'true'
-        run: |
-          ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
-          IOS_VERSION="${{ steps.ios_version.outputs.version }}"
-          NEW_VERSION="${{ steps.new_plugin_version.outputs.new_version }}"
-          CURRENT_VERSION="${{ steps.current_versions.outputs.current_plugin }}"
-          CURRENT_ANDROID="${{ steps.current_versions.outputs.current_android }}"
-          CURRENT_IOS="${{ steps.current_versions.outputs.current_ios }}"
-          ANDROID_UPDATED="${{ steps.check_updates.outputs.android_updated }}"
-          IOS_UPDATED="${{ steps.check_updates.outputs.ios_updated }}"
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update native agents to v${{ steps.new_plugin_version.outputs.new_version }}"
+          branch: "update-native-agents-${{ steps.new_plugin_version.outputs.new_version }}"
+          delete-branch: true
+          title: "chore: update native agents to v${{ steps.new_plugin_version.outputs.new_version }}"
+          body: |
+            ## Updates
+            - **Android Agent**: ${{ steps.current_versions.outputs.current_android }} → ${{ steps.android_version.outputs.version }}
+            - **iOS Agent**: ${{ steps.current_versions.outputs.current_ios }} → ${{ steps.ios_version.outputs.version }}
+            - **Plugin Version**: ${{ steps.current_versions.outputs.current_plugin }} → ${{ steps.new_plugin_version.outputs.new_version }}
 
-          # Create branch name
-          BRANCH_NAME="update-native-agents-${NEW_VERSION}"
+            ## Testing
+            - [ ] Android app builds successfully
+            - [ ] iOS app builds successfully
+            - [ ] Manual testing completed
+            - [ ] Unity package imports correctly
 
-          # Create and checkout new branch
-          git checkout -b "$BRANCH_NAME"
-
-          # Add changes
-          git add package.json \
-                  README.md \
-                  CHANGELOG.md \
-                  com.newrelic.agent/Editor/TestUnityDependencies.xml \
-                  com.newrelic.agent/Scripts/Native/NewRelicAndroid.cs
-
-          # Create commit message
-          COMMIT_MSG="chore: update native agents to v${NEW_VERSION}"
-
-          COMMIT_BODY=""
-          if [ "$ANDROID_UPDATED" = "true" ]; then
-            COMMIT_BODY="${COMMIT_BODY}\n- Updated Android agent from ${CURRENT_ANDROID} to ${ANDROID_VERSION}"
-          fi
-          if [ "$IOS_UPDATED" = "true" ]; then
-            COMMIT_BODY="${COMMIT_BODY}\n- Updated iOS agent from ${CURRENT_IOS} to ${IOS_VERSION}"
-          fi
-          COMMIT_BODY="${COMMIT_BODY}\n- Bumped plugin version from ${CURRENT_VERSION} to ${NEW_VERSION}"
-          COMMIT_BODY="${COMMIT_BODY}\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>"
-
-          # Commit changes
-          git commit -m "$(echo -e "${COMMIT_MSG}${COMMIT_BODY}")"
-
-          # Push branch
-          git push origin HEAD
-
-          # Create PR body
-          PR_BODY="## Updates\n\nThis PR updates the native agent versions:\n\n"
-
-          if [ "$ANDROID_UPDATED" = "true" ]; then
-            PR_BODY="${PR_BODY}- **Android Agent**: ${CURRENT_ANDROID} → ${ANDROID_VERSION}\n"
-          fi
-
-          if [ "$IOS_UPDATED" = "true" ]; then
-            PR_BODY="${PR_BODY}- **iOS Agent**: ${CURRENT_IOS} → ${IOS_VERSION}\n"
-          fi
-
-          PR_BODY="${PR_BODY}- **Plugin Version**: ${CURRENT_VERSION} → ${NEW_VERSION}\n\n"
-          PR_BODY="${PR_BODY}## Files Updated\n\n"
-          PR_BODY="${PR_BODY}- \`package.json\` - Updated plugin version\n"
-          PR_BODY="${PR_BODY}- \`com.newrelic.agent/Editor/TestUnityDependencies.xml\` - Updated native agent dependencies\n"
-          PR_BODY="${PR_BODY}- \`com.newrelic.agent/Scripts/Native/NewRelicAndroid.cs\` - Updated application framework version\n"
-          PR_BODY="${PR_BODY}- \`CHANGELOG.md\` - Added release notes\n"
-          PR_BODY="${PR_BODY}- \`README.md\` - Updated documentation with latest versions\n\n"
-          PR_BODY="${PR_BODY}## Testing\n\n"
-          PR_BODY="${PR_BODY}- [ ] Android app builds successfully\n"
-          PR_BODY="${PR_BODY}- [ ] iOS app builds successfully\n"
-          PR_BODY="${PR_BODY}- [ ] Manual testing completed\n"
-          PR_BODY="${PR_BODY}- [ ] Unity package imports correctly\n\n"
-          PR_BODY="${PR_BODY}---\n\n"
-          PR_BODY="${PR_BODY}This PR was automatically created by the Update Native Agent Versions workflow.\n\n"
-          PR_BODY="${PR_BODY}🤖 Generated with [Claude Code](https://claude.com/claude-code)"
-
-          # Create PR using gh CLI
-          gh pr create \
-            -B "main" \
-            -H "$BRANCH_NAME" \
-            --title "chore: update native agents to v${NEW_VERSION}" \
-            --body "$(echo -e "$PR_BODY")"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            ---
+            🤖 *Automated PR created by Update Native Agent Versions workflow.*
 
       - name: Summary
         if: steps.check_updates.outputs.needs_update == 'true'
