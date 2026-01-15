@@ -61,6 +61,8 @@ jobs:
   update-documentation:
     needs: create-release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       AGENT_NAME: "unity"
       AGENT_TITLE: "Unity agent"
