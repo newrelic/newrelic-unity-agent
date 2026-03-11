@@ -21,8 +21,13 @@ This agent utilizes the native New Relic Android and iOS agents to instrument Un
 ## Current Support:
 - Android API 24+ (AGP 7 and Higher)
 - iOS:
-    - iOS 10+ (for plugin versions below 1.4.11)
-    - iOS 16+ (starting from plugin version 1.4.11)
+
+  | Agent Version | Minimum iOS Version |
+  | :--- | :--- |
+  | < 1.4.11 | iOS 10+ |
+  | 1.4.11 – 1.4.13 | iOS 16+ |
+  | >= 1.4.14 | iOS 15+ |
+
 - Depends on New Relic iOS/XCFramework and Android agents
 
 ## Installation
