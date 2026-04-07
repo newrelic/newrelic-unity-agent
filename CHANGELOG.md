@@ -1,4 +1,4 @@
-## 1.4.16
+## 1.5.0
 
 ## Improvements
 - Native iOS agent updated to version 7.7.0
