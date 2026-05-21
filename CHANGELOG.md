@@ -1,3 +1,10 @@
+## 1.5.3
+
+## Improvements
+- Native Android agent updated to version 7.7.5
+- Native iOS agent updated to version 7.7.1
+
+
 ## 1.5.2
 
 ## Improvements
