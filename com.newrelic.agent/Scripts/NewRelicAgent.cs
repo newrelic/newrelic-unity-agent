@@ -35,9 +35,9 @@ namespace NewRelic
 
         /// <summary>
         /// The detail of logging provided by New Relic for internal operations.
-        /// defaults to <c>ERROR</c>
+        /// defaults to <c>WARNING</c>
         /// </summary>
-        public AgentLogLevel logLevel = AgentLogLevel.ERROR;
+        public AgentLogLevel logLevel = AgentLogLevel.WARNING;
 
         /// <summary>
         /// Enable or disable SSL for New Relic data posts
