@@ -1,4 +1,4 @@
-## Unreleased
+## 1.6.0
 
 ## New Features
 - iOS dependencies can now be resolved via Swift Package Manager. The package's
