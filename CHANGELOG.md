@@ -1,10 +1,4 @@
-## 1.5.4
-
-## Improvements
-- Native iOS agent updated to version 7.7.2
-
-
-## Unreleased
+## 1.6.0
 
 ## New Features
 - iOS dependencies can now be resolved via Swift Package Manager. The package's

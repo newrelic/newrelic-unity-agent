@@ -199,15 +199,29 @@ jobs:
           echo "Android agent: $ANDROID_VERSION"
           echo "iOS agent (CocoaPods + SPM): $IOS_VERSION"
 
-      - name: Update NewRelicAndroid.cs Plugin Version
+      - name: Update native bridge plugin versions
         if: steps.check_updates.outputs.needs_update == 'true'
         run: |
           NEW_VERSION="${{ steps.new_plugin_version.outputs.new_version }}"
 
-          # Update version in NewRelicAndroid.cs withApplicationFramework call
+          # Android bridge: bump the version string passed to withApplicationFramework
           sed -i "s/agentInstance\.Call<AndroidJavaObject>(\"withApplicationFramework\", platform, \"[0-9.]\+\")/agentInstance.Call<AndroidJavaObject>(\"withApplicationFramework\", platform, \"$NEW_VERSION\")/" com.newrelic.agent/Scripts/Native/NewRelicAndroid.cs
-
           echo "Updated NewRelicAndroid.cs to version $NEW_VERSION"
+
+          # iOS bridge: bump the version string passed to NR_setPlatform
+          sed -i "s/NR_setPlatform(\"[0-9.]\+\")/NR_setPlatform(\"$NEW_VERSION\")/" com.newrelic.agent/Scripts/Native/NewRelicIos.cs
+          echo "Updated NewRelicIos.cs to version $NEW_VERSION"
+
+          # Fail loudly if either file still contains the old version — catches
+          # drift if someone renames the bridge call without updating this step.
+          if grep -q "withApplicationFramework.*\"${{ steps.current_versions.outputs.current_plugin }}\"" com.newrelic.agent/Scripts/Native/NewRelicAndroid.cs; then
+            echo "::error::NewRelicAndroid.cs still contains the previous plugin version. Did the bridge call signature change?"
+            exit 1
+          fi
+          if grep -q "NR_setPlatform(\"${{ steps.current_versions.outputs.current_plugin }}\")" com.newrelic.agent/Scripts/Native/NewRelicIos.cs; then
+            echo "::error::NewRelicIos.cs still contains the previous plugin version. Did the bridge call signature change?"
+            exit 1
+          fi
 
       - name: Update README.md
         if: steps.check_updates.outputs.needs_update == 'true'
