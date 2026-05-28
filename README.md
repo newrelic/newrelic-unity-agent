@@ -119,19 +119,39 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
   By making these changes in your Gradle files, you will ensure that the New Relic artifacts are properly downloaded and included in your Unity project.
 
 
-6. Please ensure that your External Dependency Manager settings match the following configuration. In your Unity IDE, navigate to Assets → External Dependency Manager → iOS Resolver → Settings:
+6. Choose an iOS dependency resolution method
 
-   1. Add use_frameworks! to Podfile is unchecked.
-   2. Always add the main target to Podfile box is checked.
+   The package's `TestUnityDependencies.xml` declares the New Relic iOS agent for both **Swift Package Manager (SPM)** and **CocoaPods**. The External Dependency Manager (EDM4U) bundled with this package (v1.2.187+) supports both. Pick one:
 
-  <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
+   ### Option A — Swift Package Manager (recommended)
 
-7. If the Podfile is not being used for iOS dependency management, you can proceed with the following steps.
+   SPM is enabled by default in EDM4U 1.2.187+. When enabled, the `replacesPod` attribute on the SPM declaration causes EDM4U to automatically suppress the matching CocoaPods entry, so you don't need to disable anything manually.
 
-   1. Download and unzip the New Relic XCFramework SDK
-    Download the latest iOS agent from our [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes)
-   2. Add the New Relic XCFramework to your Xcode project
-     Unzip the SDK download, drag the “NewRelicAgent.xcframework” folder from the Finder into your Xcode project (dropping it onto your Targets Frameworks pane). Select “Embed & Sign” under the Embed column.
+   1. In your Unity IDE, go to **Assets → External Dependency Manager → iOS Resolver → Settings** and confirm **Swift Package Manager Enabled** is checked (this is the default).
+   2. Build for iOS as normal. EDM4U injects an `XCRemoteSwiftPackageReference` into the generated `Unity-iPhone.xcodeproj` pointing at [`newrelic/newrelic-ios-agent-spm`](https://github.com/newrelic/newrelic-ios-agent-spm), and Xcode resolves it on first build.
+   3. No `Podfile` is generated for the New Relic agent.
+
+   ### Option B — CocoaPods
+
+   1. In **Assets → External Dependency Manager → iOS Resolver → Settings**, uncheck **Swift Package Manager Enabled**.
+   2. Confirm:
+      - **Add use_frameworks! to Podfile** is unchecked.
+      - **Always add the main target to Podfile** is checked.
+
+   <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
+
+   3. After building from Unity, run `pod install` in the generated Xcode project directory if EDM4U did not run it automatically.
+
+   ### Option C — Manual XCFramework drop-in
+
+   If you are not using EDM4U at all on the iOS side:
+
+   1. Download and unzip the New Relic XCFramework SDK from the [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes).
+   2. Drag `NewRelicAgent.xcframework` from Finder into your Xcode project (dropping it onto your target's **Frameworks, Libraries, and Embedded Content** pane). Select **Embed & Sign** under the Embed column.
+
+   ### Verifying SPM end-to-end
+
+   See [`com.newrelic.agent/Documentation/SPM_VERIFICATION.md`](com.newrelic.agent/Documentation/SPM_VERIFICATION.md) for a step-by-step walk-through that uses the bundled `Demo` sample to verify SPM resolution from a clean Unity project.
 
 
 
