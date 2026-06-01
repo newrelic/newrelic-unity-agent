@@ -1,3 +1,16 @@
+## 1.6.0
+
+## New Features
+- iOS dependencies can now be resolved via Swift Package Manager. The package's
+  `TestUnityDependencies.xml` declares both a `<remoteSwiftPackage>` block
+  pointing at [`newrelic/newrelic-ios-agent-spm`](https://github.com/newrelic/newrelic-ios-agent-spm)
+  and the existing `<iosPod>` block. EDM4U automatically suppresses the pod
+  via `replacesPod` when SPM is enabled. See `Documentation/SPM_VERIFICATION.md`.
+
+## Improvements
+- Bundled External Dependency Manager for Unity (EDM4U) upgraded from 1.2.175
+  to 1.2.187 (required for Swift Package Manager support).
+
 ## 1.5.3
 
 ## Improvements

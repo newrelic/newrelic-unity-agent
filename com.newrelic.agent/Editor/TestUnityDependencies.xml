@@ -12,4 +12,17 @@
       </sources>
     </iosPod>
   </iosPods>
+  <!--
+    Swift Package Manager declaration. Requires External Dependency Manager
+    for Unity (EDM4U) v1.2.187 or later. When the iOS Resolver "Swift Package
+    Manager Enabled" setting is on (default), the NewRelicAgent pod above is
+    automatically suppressed via `replacesPod` and the SPM package is added
+    directly to the generated Unity-iPhone Xcode project. On older EDM4U
+    versions, this block is ignored and CocoaPods is used as a fallback.
+  -->
+  <remoteSwiftPackage url="https://github.com/newrelic/newrelic-ios-agent-spm"
+                      version="7.7.2"
+                      upToNextMajor="true">
+    <swiftPackage name="NewRelic" replacesPod="NewRelicAgent"/>
+  </remoteSwiftPackage>
 </dependencies>
