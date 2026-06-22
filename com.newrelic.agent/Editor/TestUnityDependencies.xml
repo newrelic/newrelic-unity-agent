@@ -2,11 +2,11 @@
 <dependencies>
   <androidPackages>
     <androidPackage spec="com.newrelic.agent.android:agent-ndk:1.1.3"/>
-    <androidPackage spec="com.newrelic.agent.android:android-agent:7.7.5">
+    <androidPackage spec="com.newrelic.agent.android:android-agent:7.7.6">
         </androidPackage>
   </androidPackages>
   <iosPods>
-    <iosPod name="NewRelicAgent" version="~&gt; 7.7.1" minTargetSdk="11.0">
+    <iosPod name="NewRelicAgent" version="~&gt; 7.7.2" minTargetSdk="11.0">
       <sources>
         <source>https://github.com/CocoaPods/Specs</source>
       </sources>
@@ -20,9 +20,7 @@
     directly to the generated Unity-iPhone Xcode project. On older EDM4U
     versions, this block is ignored and CocoaPods is used as a fallback.
   -->
-  <remoteSwiftPackage url="https://github.com/newrelic/newrelic-ios-agent-spm"
-                      version="7.7.2"
-                      upToNextMajor="true">
+  <remoteSwiftPackage url="https://github.com/newrelic/newrelic-ios-agent-spm" version="7.7.2" upToNextMajor="true">
     <swiftPackage name="NewRelic" replacesPod="NewRelicAgent"/>
   </remoteSwiftPackage>
 </dependencies>
