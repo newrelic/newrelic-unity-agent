@@ -423,7 +423,7 @@ namespace NewRelic.Native
 
         override public bool setAttribute(string name, double value)
         {
-            return pluginInstance.CallStatic<Boolean>("setAttribute", name, Convert.ToSingle(value));
+            return pluginInstance.CallStatic<Boolean>("setAttribute", name, value);
         }
 
         override public bool incrementAttribute(string name)
@@ -433,7 +433,7 @@ namespace NewRelic.Native
 
         override public bool incrementAttribute(string name, double amount)
         {
-            return pluginInstance.CallStatic<Boolean>("incrementAttribute", name, Convert.ToSingle(amount));
+            return pluginInstance.CallStatic<Boolean>("incrementAttribute", name, amount);
         }
 
         override public bool removeAttribute(string name)
