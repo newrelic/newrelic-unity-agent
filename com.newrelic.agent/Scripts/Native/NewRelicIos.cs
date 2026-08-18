@@ -296,7 +296,7 @@ namespace NewRelic.Native
 
 		override public void start(string applicationToken)
 		{
-			NR_setPlatform("1.6.3");
+			NR_setPlatform("1.6.4");
 			NewRelic_startWithApplicationToken(applicationToken);
 		}
 
