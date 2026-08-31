@@ -63,7 +63,7 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
  apply plugin: 'newrelic' // <-- add this
 dependencies {
     implementation project(':unityLibrary')
-    implementation 'com.newrelic.agent.android:agent-ndk:1.1.3' 
+    implementation 'com.newrelic.agent.android:agent-ndk:1.1.5' 
     implementation 'com.newrelic.agent.android:android-agent:7.8.2' 
     }
 
