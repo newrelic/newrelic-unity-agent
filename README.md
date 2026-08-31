@@ -63,8 +63,8 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
  apply plugin: 'newrelic' // <-- add this
 dependencies {
     implementation project(':unityLibrary')
-    implementation 'com.newrelic.agent.android:agent-ndk:1.1.1' 
-    implementation 'com.newrelic.agent.android:android-agent:7.8.1' 
+    implementation 'com.newrelic.agent.android:agent-ndk:1.1.5' 
+    implementation 'com.newrelic.agent.android:android-agent:7.8.2' 
     }
 
 android {
@@ -96,7 +96,7 @@ android {
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
-            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.8.1'
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.8.2'
             **BUILD_SCRIPT_DEPS**
         }
     }
@@ -110,7 +110,7 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
             // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
             // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
             // To specify a custom Gradle version in Unity, go to "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
-            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.8.1'
+            classpath 'com.newrelic.agent.android:agent-gradle-plugin:7.8.2'
             **BUILD_SCRIPT_DEPS**
         }
     }
@@ -121,37 +121,34 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
 
 6. Choose an iOS dependency resolution method
 
-   The package's `TestUnityDependencies.xml` declares the New Relic iOS agent for both **Swift Package Manager (SPM)** and **CocoaPods**. The External Dependency Manager (EDM4U) bundled with this package (v1.2.187+) supports both. Pick one:
+   The package's `TestUnityDependencies.xml` declares the New Relic iOS agent as a **CocoaPod**, resolved by the bundled External Dependency Manager for Unity (EDM4U).
 
-   ### Option A — Swift Package Manager (recommended)
+   ### Option A — CocoaPods (recommended)
 
-   SPM is enabled by default in EDM4U 1.2.187+. When enabled, the `replacesPod` attribute on the SPM declaration causes EDM4U to automatically suppress the matching CocoaPods entry, so you don't need to disable anything manually.
-
-   1. In your Unity IDE, go to **Assets → External Dependency Manager → iOS Resolver → Settings** and confirm **Swift Package Manager Enabled** is checked (this is the default).
-   2. Build for iOS as normal. EDM4U injects an `XCRemoteSwiftPackageReference` into the generated `Unity-iPhone.xcodeproj` pointing at [`newrelic/newrelic-ios-agent-spm`](https://github.com/newrelic/newrelic-ios-agent-spm), and Xcode resolves it on first build.
-   3. No `Podfile` is generated for the New Relic agent.
-
-   ### Option B — CocoaPods
-
-   1. In **Assets → External Dependency Manager → iOS Resolver → Settings**, uncheck **Swift Package Manager Enabled**.
-   2. Confirm:
+   1. In **Assets → External Dependency Manager → iOS Resolver → Settings**, confirm:
       - **Add use_frameworks! to Podfile** is unchecked.
       - **Always add the main target to Podfile** is checked.
 
    <img width="407" alt="Screenshot 2023-07-13 at 1 22 21 PM" src="https://github.com/ndesai-newrelic/newrelic-unity-agent/assets/89222514/5de6fb36-f60d-4470-a1c6-78975d4c4a10">
 
-   3. After building from Unity, run `pod install` in the generated Xcode project directory if EDM4U did not run it automatically.
+   2. After building from Unity, run `pod install` in the generated Xcode project directory if EDM4U did not run it automatically.
 
-   ### Option C — Manual XCFramework drop-in
+   ### Option B — Manual XCFramework drop-in
 
    If you are not using EDM4U at all on the iOS side:
 
    1. Download and unzip the New Relic XCFramework SDK from the [iOS agent release notes](https://docs.newrelic.com/docs/release-notes/mobile-release-notes/ios-release-notes).
-   2. Drag `NewRelicAgent.xcframework` from Finder into your Xcode project (dropping it onto your target's **Frameworks, Libraries, and Embedded Content** pane). Select **Embed & Sign** under the Embed column.
+   2. Drag `NewRelic.xcframework` from Finder into your Xcode project (dropping it onto your target's **Frameworks, Libraries, and Embedded Content** pane). Select **Embed & Sign** under the Embed column.
 
-   ### Verifying SPM end-to-end
+   ### A note on Swift Package Manager
 
-   See [`com.newrelic.agent/Documentation/SPM_VERIFICATION.md`](com.newrelic.agent/Documentation/SPM_VERIFICATION.md) for a step-by-step walk-through that uses the bundled `Demo` sample to verify SPM resolution from a clean Unity project.
+   Plugin versions 1.6.0–1.6.4 also declared the agent as a Swift Package. **That declaration was removed in 1.7.0 because it crashed iOS apps on launch.**
+
+   EDM4U's SPM resolver links package products against the `UnityFramework` target only and never embeds them into the built `.app`. Since `NewRelic.xcframework` is a dynamic framework, it was missing at runtime and the app failed to start with `Library not loaded: @rpath/NewRelic.framework/NewRelic`. EDM4U enables SPM by default, so this was the default iOS path on those versions.
+
+   If you are on 1.6.0–1.6.4 and cannot upgrade yet, uncheck **Swift Package Manager Enabled** in **Assets → External Dependency Manager → iOS Resolver → Settings** and rebuild to fall back to CocoaPods.
+
+   Tracking: [#82](https://github.com/newrelic/newrelic-unity-agent/issues/82) and upstream [googlesamples/unity-jar-resolver#779](https://github.com/googlesamples/unity-jar-resolver/issues/779). SPM support will return once the agent embeds and signs the framework itself, or the upstream bug is fixed.
 
 
 

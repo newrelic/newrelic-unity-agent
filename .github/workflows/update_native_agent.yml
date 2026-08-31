@@ -11,6 +11,10 @@ on:
         description: 'iOS agent version (leave empty to fetch latest)'
         required: false
         type: string
+      ndk_version:
+        description: 'Android NDK agent (agent-ndk) version (leave empty to fetch latest)'
+        required: false
+        type: string
       create_pr:
         description: 'Create PR with new branch (always true for this workflow)'
         required: false
@@ -60,6 +64,28 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Fetch latest Android NDK agent version
+        id: ndk_version
+        run: |
+          if [ -n "${{ inputs.ndk_version }}" ]; then
+            VERSION="${{ inputs.ndk_version }}"
+            echo "Using provided NDK version: $VERSION"
+          else
+            # agent-ndk is released independently of android-agent — android-agent's
+            # POM declares no dependency on it — so its latest version is fetched
+            # separately rather than assumed to track the Android agent version.
+            VERSION=$(curl -s 'https://repo1.maven.org/maven2/com/newrelic/agent/android/agent-ndk/maven-metadata.xml' | \
+              grep '<latest>' | \
+              sed 's/.*<latest>\(.*\)<\/latest>.*/\1/')
+            echo "Fetched latest NDK version: $VERSION"
+          fi
+
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not determine an agent-ndk version. Refusing to continue rather than writing an empty version into TestUnityDependencies.xml."
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Fetch latest iOS agent version
         id: ios_version
         run: |
@@ -83,49 +109,40 @@ jobs:
           # Extract Android version from TestUnityDependencies.xml
           CURRENT_ANDROID=$(xmlstarlet sel -t -v "//androidPackage[contains(@spec, 'android-agent')]/@spec" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/.*:\([0-9.]*\).*/\1/')
 
+          # Extract Android NDK agent version from TestUnityDependencies.xml
+          CURRENT_NDK=$(xmlstarlet sel -t -v "//androidPackage[contains(@spec, 'agent-ndk')]/@spec" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/.*:\([0-9.]*\).*/\1/')
+
           # Extract iOS version from TestUnityDependencies.xml (CocoaPods)
           CURRENT_IOS=$(xmlstarlet sel -t -v "//iosPod[@name='NewRelicAgent']/@version" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/~> //')
 
-          # Extract iOS version from the Swift Package Manager declaration
-          CURRENT_IOS_SPM=$(xmlstarlet sel -t -v "//remoteSwiftPackage[contains(@url, 'newrelic-ios-agent-spm')]/@version" com.newrelic.agent/Editor/TestUnityDependencies.xml)
-
           echo "current_android=$CURRENT_ANDROID" >> $GITHUB_OUTPUT
+          echo "current_ndk=$CURRENT_NDK" >> $GITHUB_OUTPUT
           echo "current_ios=$CURRENT_IOS" >> $GITHUB_OUTPUT
-          echo "current_ios_spm=$CURRENT_IOS_SPM" >> $GITHUB_OUTPUT
           echo "current_plugin=$CURRENT_PLUGIN" >> $GITHUB_OUTPUT
 
           echo "Current Android version: $CURRENT_ANDROID"
+          echo "Current Android NDK version: $CURRENT_NDK"
           echo "Current iOS (CocoaPods) version: $CURRENT_IOS"
-          echo "Current iOS (SPM) version: $CURRENT_IOS_SPM"
           echo "Current Plugin version: $CURRENT_PLUGIN"
-
-          if [ -n "$CURRENT_IOS_SPM" ] && [ "$CURRENT_IOS" != "$CURRENT_IOS_SPM" ]; then
-            echo "::warning::CocoaPods iOS version ($CURRENT_IOS) and SPM iOS version ($CURRENT_IOS_SPM) are out of sync. They will be re-synced to the latest fetched version."
-          fi
-
-      - name: Verify Swift Package Manager tag exists for new iOS version
-        run: |
-          IOS_VERSION="${{ steps.ios_version.outputs.version }}"
-          SPM_REPO="https://github.com/newrelic/newrelic-ios-agent-spm.git"
-
-          if git ls-remote --tags "$SPM_REPO" | grep -q "refs/tags/${IOS_VERSION}$"; then
-            echo "Confirmed SPM tag $IOS_VERSION exists at $SPM_REPO"
-          else
-            echo "::error::SPM tag '$IOS_VERSION' not found at $SPM_REPO. The Swift Package Manager repo has not been tagged for this iOS agent release yet — refusing to open a PR with an unresolvable SPM version. Re-run after the SPM repo has been tagged."
-            exit 1
-          fi
 
       - name: Check if updates are needed
         id: check_updates
         run: |
           NEEDS_UPDATE=false
           ANDROID_UPDATED=false
+          NDK_UPDATED=false
           IOS_UPDATED=false
 
           if [ "${{ steps.current_versions.outputs.current_android }}" != "${{ steps.android_version.outputs.version }}" ]; then
             echo "Android version needs update"
             NEEDS_UPDATE=true
             ANDROID_UPDATED=true
+          fi
+
+          if [ "${{ steps.current_versions.outputs.current_ndk }}" != "${{ steps.ndk_version.outputs.version }}" ]; then
+            echo "Android NDK version needs update"
+            NEEDS_UPDATE=true
+            NDK_UPDATED=true
           fi
 
           if [ "${{ steps.current_versions.outputs.current_ios }}" != "${{ steps.ios_version.outputs.version }}" ]; then
@@ -136,6 +153,7 @@ jobs:
 
           echo "needs_update=$NEEDS_UPDATE" >> $GITHUB_OUTPUT
           echo "android_updated=$ANDROID_UPDATED" >> $GITHUB_OUTPUT
+          echo "ndk_updated=$NDK_UPDATED" >> $GITHUB_OUTPUT
           echo "ios_updated=$IOS_UPDATED" >> $GITHUB_OUTPUT
 
       - name: Calculate new plugin version (patch bump)
@@ -174,6 +192,7 @@ jobs:
         if: steps.check_updates.outputs.needs_update == 'true'
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
+          NDK_VERSION="${{ steps.ndk_version.outputs.version }}"
           IOS_VERSION="${{ steps.ios_version.outputs.version }}"
 
           # Update Android agent version
@@ -182,22 +201,22 @@ jobs:
             -v "com.newrelic.agent.android:android-agent:$ANDROID_VERSION" \
             com.newrelic.agent/Editor/TestUnityDependencies.xml
 
+          # Update Android NDK agent version
+          xmlstarlet ed -L \
+            -u "//androidPackage[contains(@spec, 'agent-ndk')]/@spec" \
+            -v "com.newrelic.agent.android:agent-ndk:$NDK_VERSION" \
+            com.newrelic.agent/Editor/TestUnityDependencies.xml
+
           # Update iOS agent version (CocoaPods)
           xmlstarlet ed -L \
             -u "//iosPod[@name='NewRelicAgent']/@version" \
             -v "~> $IOS_VERSION" \
             com.newrelic.agent/Editor/TestUnityDependencies.xml
 
-          # Update iOS agent version (Swift Package Manager) — SPM tag existence
-          # is verified earlier in the workflow.
-          xmlstarlet ed -L \
-            -u "//remoteSwiftPackage[contains(@url, 'newrelic-ios-agent-spm')]/@version" \
-            -v "$IOS_VERSION" \
-            com.newrelic.agent/Editor/TestUnityDependencies.xml
-
           echo "Updated TestUnityDependencies.xml"
           echo "Android agent: $ANDROID_VERSION"
-          echo "iOS agent (CocoaPods + SPM): $IOS_VERSION"
+          echo "Android NDK agent: $NDK_VERSION"
+          echo "iOS agent (CocoaPods): $IOS_VERSION"
 
       - name: Update native bridge plugin versions
         if: steps.check_updates.outputs.needs_update == 'true'
@@ -227,6 +246,7 @@ jobs:
         if: steps.check_updates.outputs.needs_update == 'true'
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
+          NDK_VERSION="${{ steps.ndk_version.outputs.version }}"
 
           # Update Android agent version references in README.md
           # Update agent-gradle-plugin reference
@@ -235,22 +255,51 @@ jobs:
           # Update android-agent references in dependency examples
           sed -i "s/com.newrelic.agent.android:android-agent:[0-9.]\+/com.newrelic.agent.android:android-agent:$ANDROID_VERSION/" README.md
 
-          echo "Updated README.md with Android agent version $ANDROID_VERSION"
+          # Update agent-ndk references in dependency examples. These had drifted
+          # from TestUnityDependencies.xml because this step never managed them.
+          sed -i "s/com.newrelic.agent.android:agent-ndk:[0-9.]\+/com.newrelic.agent.android:agent-ndk:$NDK_VERSION/" README.md
+
+          echo "Updated README.md with Android agent version $ANDROID_VERSION and NDK version $NDK_VERSION"
+
+          # The README Gradle snippets must agree with TestUnityDependencies.xml,
+          # otherwise users hand-editing their Gradle files pull a different agent
+          # than the resolver does.
+          XML_ANDROID=$(xmlstarlet sel -t -v "//androidPackage[contains(@spec, 'android-agent')]/@spec" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/.*:\([0-9.]*\).*/\1/')
+          XML_NDK=$(xmlstarlet sel -t -v "//androidPackage[contains(@spec, 'agent-ndk')]/@spec" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/.*:\([0-9.]*\).*/\1/')
+          for pair in "android-agent:$XML_ANDROID" "agent-ndk:$XML_NDK"; do
+            artifact="${pair%%:*}"
+            expected="${pair##*:}"
+            if grep -q "com\.newrelic\.agent\.android:${artifact}:" README.md && \
+               ! grep -q "com\.newrelic\.agent\.android:${artifact}:${expected}" README.md; then
+              echo "::error::README.md references ${artifact} at a version other than ${expected} from TestUnityDependencies.xml."
+              grep -n "com\.newrelic\.agent\.android:${artifact}:" README.md
+              exit 1
+            fi
+          done
+          echo "README.md and TestUnityDependencies.xml agree on Android artifact versions"
 
       - name: Update CHANGELOG.md
         if: steps.check_updates.outputs.needs_update == 'true'
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
+          NDK_VERSION="${{ steps.ndk_version.outputs.version }}"
           IOS_VERSION="${{ steps.ios_version.outputs.version }}"
           NEW_VERSION="${{ steps.new_plugin_version.outputs.new_version }}"
           ANDROID_UPDATED="${{ steps.check_updates.outputs.android_updated }}"
+          NDK_UPDATED="${{ steps.check_updates.outputs.ndk_updated }}"
           IOS_UPDATED="${{ steps.check_updates.outputs.ios_updated }}"
 
-          # Create changelog entry
+          # Create changelog entry. Each bullet must be a single line:
+          # .github/scripts/generate-docs.sh selects them with `grep "^-"` when
+          # building the public docs release notes, so wrapped lines are dropped.
           CHANGELOG_ENTRY="## $NEW_VERSION\n\n## Improvements\n"
 
           if [ "$ANDROID_UPDATED" = "true" ]; then
             CHANGELOG_ENTRY="${CHANGELOG_ENTRY}- Native Android agent updated to version ${ANDROID_VERSION}\n"
+          fi
+
+          if [ "$NDK_UPDATED" = "true" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}- Native Android NDK agent updated to version ${NDK_VERSION}\n"
           fi
 
           if [ "$IOS_UPDATED" = "true" ]; then
@@ -277,14 +326,14 @@ jobs:
           body: |
             ## Updates
             - **Android Agent**: ${{ steps.current_versions.outputs.current_android }} → ${{ steps.android_version.outputs.version }}
+            - **Android NDK Agent**: ${{ steps.current_versions.outputs.current_ndk }} → ${{ steps.ndk_version.outputs.version }}
             - **iOS Agent (CocoaPods)**: ${{ steps.current_versions.outputs.current_ios }} → ${{ steps.ios_version.outputs.version }}
-            - **iOS Agent (Swift Package Manager)**: ${{ steps.current_versions.outputs.current_ios_spm }} → ${{ steps.ios_version.outputs.version }}
             - **Plugin Version**: ${{ steps.current_versions.outputs.current_plugin }} → ${{ steps.new_plugin_version.outputs.new_version }}
 
             ## Testing
             - [ ] Android app builds successfully
             - [ ] iOS app builds successfully via CocoaPods
-            - [ ] iOS app builds successfully via Swift Package Manager (default in EDM4U 1.2.187+)
+            - [ ] iOS app launches on a physical device
             - [ ] Manual testing completed
             - [ ] Unity package imports correctly
 
@@ -299,8 +348,8 @@ jobs:
           echo "| Component | Old Version | New Version |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|-------------|-------------|" >> $GITHUB_STEP_SUMMARY
           echo "| Android Agent | ${{ steps.current_versions.outputs.current_android }} | ${{ steps.android_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Android NDK Agent | ${{ steps.current_versions.outputs.current_ndk }} | ${{ steps.ndk_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
           echo "| iOS Agent (CocoaPods) | ${{ steps.current_versions.outputs.current_ios }} | ${{ steps.ios_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| iOS Agent (SPM) | ${{ steps.current_versions.outputs.current_ios_spm }} | ${{ steps.ios_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Plugin Version | ${{ steps.current_versions.outputs.current_plugin }} | ${{ steps.new_plugin_version.outputs.new_version }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: No updates needed
