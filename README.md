@@ -63,7 +63,7 @@ In your Unity IDE, click Tools → NewRelic → Getting Started to open the NewR
  apply plugin: 'newrelic' // <-- add this
 dependencies {
     implementation project(':unityLibrary')
-    implementation 'com.newrelic.agent.android:agent-ndk:1.1.1' 
+    implementation 'com.newrelic.agent.android:agent-ndk:1.1.3' 
     implementation 'com.newrelic.agent.android:android-agent:7.8.2' 
     }
 
@@ -142,7 +142,7 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
 
    ### A note on Swift Package Manager
 
-   Plugin versions 1.6.0–1.6.4 also declared the agent as a Swift Package. **That declaration was removed in 1.6.5 because it crashed iOS apps on launch.**
+   Plugin versions 1.6.0–1.6.4 also declared the agent as a Swift Package. **That declaration was removed in 1.7.0 because it crashed iOS apps on launch.**
 
    EDM4U's SPM resolver links package products against the `UnityFramework` target only and never embeds them into the built `.app`. Since `NewRelic.xcframework` is a dynamic framework, it was missing at runtime and the app failed to start with `Library not loaded: @rpath/NewRelic.framework/NewRelic`. EDM4U enables SPM by default, so this was the default iOS path on those versions.
 

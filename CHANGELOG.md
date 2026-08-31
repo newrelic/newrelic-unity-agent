@@ -1,24 +1,21 @@
-## 1.6.6
+## 1.7.0
+
+## Bug fixes
+- Fixed iOS apps crashing on launch with `Library not loaded: @rpath/NewRelic.framework/NewRelic`. The Swift Package Manager declaration added in 1.6.0 has been removed and iOS dependencies now resolve via CocoaPods only. Builds on 1.6.0 through 1.6.4 were affected unless Swift Package Manager was manually disabled in the EDM4U iOS Resolver settings.
+  EDM4U's SPM resolver links package products against the `UnityFramework` target without embedding
+  them into the built `.app`, so the dynamic `NewRelic.xcframework` was never present at runtime.
+  Because EDM4U enables SPM by default, this was the default iOS path on those versions. See
+  [#82](https://github.com/newrelic/newrelic-unity-agent/issues/82) and the upstream report
+  [googlesamples/unity-jar-resolver#779](https://github.com/googlesamples/unity-jar-resolver/issues/779).
+- Fixed the New Relic iOS agent being missing entirely from builds on Unity 2019.1 through 2021.2, where EDM4U suppressed the `NewRelicAgent` pod but skipped Swift Package Manager injection because it requires Unity 2021.3 or newer.
 
 ## Improvements
 - Native Android agent updated to version 7.8.2
 - Native iOS agent updated to version 7.7.6
 
-
-## 1.6.5
-
-## Bug fixes
-- Fixed iOS apps crashing on launch with `Library not loaded: @rpath/NewRelic.framework/NewRelic`.
-  The Swift Package Manager declaration added in 1.6.0 has been removed; iOS dependencies now
-  resolve via CocoaPods only. EDM4U's SPM resolver links package products against the
-  `UnityFramework` target without embedding them in the built `.app`, so the dynamic
-  `NewRelic.xcframework` was never present at runtime. Because EDM4U enables SPM by default,
-  this affected iOS builds on 1.6.0 through 1.6.4 unless SPM was manually disabled.
-  See [#82](https://github.com/newrelic/newrelic-unity-agent/issues/82) and upstream
-  [googlesamples/unity-jar-resolver#779](https://github.com/googlesamples/unity-jar-resolver/issues/779).
-- Removing the declaration also fixes iOS builds on Unity 2019.1–2021.2, where EDM4U suppressed
-  the `NewRelicAgent` pod via `replacesPod` but skipped SPM injection entirely (it requires
-  Unity 2021.3+), leaving the agent absent from the build.
+## Upgrade notes
+- iOS dependencies now resolve through CocoaPods only. No action is needed if you previously used Swift Package Manager, as EDM4U falls back to the `NewRelicAgent` pod automatically and the **Swift Package Manager Enabled** setting can be left checked.
+- If a generated Xcode project still carries a `newrelic-ios-agent-spm` package reference from an earlier build, delete the generated project and rebuild from Unity to clear it.
 
 
 ## 1.6.4
@@ -58,8 +55,8 @@
   and the existing `<iosPod>` block. EDM4U automatically suppresses the pod
   via `replacesPod` when SPM is enabled. See `Documentation/SPM_VERIFICATION.md`.
 
-  > **Retracted in 1.6.5.** This path crashes iOS apps on launch and was removed.
-  > Do not use 1.6.0–1.6.4 with Swift Package Manager enabled. See the 1.6.5 notes.
+  > **Retracted in 1.7.0.** This path crashes iOS apps on launch and was removed.
+  > Do not use 1.6.0–1.6.4 with Swift Package Manager enabled. See the 1.7.0 notes.
 
 ## Improvements
 - Bundled External Dependency Manager for Unity (EDM4U) upgraded from 1.2.175

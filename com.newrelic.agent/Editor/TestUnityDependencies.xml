@@ -14,7 +14,7 @@
   </iosPods>
   <!--
     A <remoteSwiftPackage> declaration for newrelic-ios-agent-spm was removed
-    here in plugin 1.6.5. EDM4U's Swift Package Manager resolver links package
+    here in plugin 1.7.0. EDM4U's Swift Package Manager resolver links package
     products against the UnityFramework target only and never embeds them in
     the built .app, so the dynamic NewRelic.framework was missing at runtime
     and the app crashed on launch with:
