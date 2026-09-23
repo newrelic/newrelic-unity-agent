@@ -531,7 +531,15 @@ namespace NewRelic.Native
 			Dictionary<string, object> dtHeaders = new Dictionary<string, object>();
 			dtHeaders.Add(NRConstants.TRACE_PARENT, NR_dictionarygetStringValueByKey(NSDict, NRConstants.TRACE_PARENT));
 			dtHeaders.Add(NRConstants.TRACE_STATE, NR_dictionarygetStringValueByKey(NSDict, NRConstants.TRACE_STATE));
-			dtHeaders.Add(NRConstants.NEWRELIC, NR_dictionarygetStringValueByKey(NSDict, NRConstants.NEWRELIC));
+
+			// The proprietary "newrelic" header is no longer sent for Distributed
+			// Tracing, so the native SDK no longer returns this key at all. Only add
+			// it when present, rather than adding a null value unconditionally.
+			string newrelic = NR_dictionarygetStringValueByKey(NSDict, NRConstants.NEWRELIC);
+			if (newrelic != null)
+			{
+				dtHeaders.Add(NRConstants.NEWRELIC, newrelic);
+			}
 
 			return dtHeaders;
 
