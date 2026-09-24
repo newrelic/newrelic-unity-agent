@@ -3,7 +3,8 @@
     "name": "NewRelic.Agent.Editor",
     "references": [
         "GUID:7dde6807ec2a448e5a2cd810ee81a054",
-        "GUID:c8624e30aafa04540afbaf8cb6bc7ec1"
+        "GUID:c8624e30aafa04540afbaf8cb6bc7ec1",
+        "GUID:f92acba2644984465882e87d940161d3"
     ],
     "includePlatforms": [
         "Editor"

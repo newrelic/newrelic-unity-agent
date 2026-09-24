@@ -697,8 +697,6 @@ namespace NewRelic.Native
             Dictionary<string, object> dtHeaders = new Dictionary<string, object>();
             AndroidJavaObject traceContext = pluginInstance.CallStatic<AndroidJavaObject>("noticeDistributedTrace", (object)null);
             AndroidJavaObject tracePayload = traceContext.Call<AndroidJavaObject>("getTracePayload");
-            string headerName = tracePayload.Call<string>("getHeaderName");
-            string headerValue = tracePayload.Call<string>("getHeaderValue");
             string spanId = tracePayload.Call<string>("getSpanId");
             string traceId = traceContext.Call<string>("getTraceId");
             string parentId = traceContext.Call<string>("getParentId");
@@ -706,7 +704,9 @@ namespace NewRelic.Native
             string accountId = traceContext.Call<string>("getAccountId");
             string applicationId = traceContext.Call<string>("getApplicationId");
 
-            dtHeaders.Add(tracePayload.Call<string>("getHeaderName"), tracePayload.Call<string>("getHeaderValue"));
+            // The proprietary "newrelic" header (tracePayload.getHeaderName()/
+            // getHeaderValue()) is intentionally not included here -- Distributed
+            // Tracing now only sends traceparent/tracestate.
             dtHeaders.Add(NRConstants.TRACE_PARENT, "00-" + traceContext.Call<string>("getTraceId") + "-" + traceContext.Call<string>("getParentId") + "-00");
             dtHeaders.Add(NRConstants.TRACE_STATE,
                 traceContext.Call<string>("getVendor") +

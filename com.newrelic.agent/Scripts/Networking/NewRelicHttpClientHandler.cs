@@ -34,6 +34,12 @@ namespace NewRelic.Networking
 
             foreach (var header in dtHeaders)
             {
+                // header.Value can be null (e.g. NEWRELIC is no longer returned by the
+                // native SDK on some platforms) -- skip rather than crash on ToString().
+                if (header.Value == null)
+                {
+                    continue;
+                }
                 if (header.Key.Equals(NRConstants.TRACE_PARENT) || header.Key.Equals(NRConstants.TRACE_STATE) || header.Key.Equals(NRConstants.NEWRELIC))
                 {
                     request.Headers.Add(header.Key, header.Value.ToString());
