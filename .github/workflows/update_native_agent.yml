@@ -20,9 +20,11 @@ on:
         required: false
         type: boolean
         default: true
+  # Only on main: a run from a feature branch force-pushes update-native-agents-<version>
+  # (the open bump PR's branch) on top of that feature branch. Test a change with a manual run.
   push:
     branches:
-      - '**'
+      - main
     paths:
       - '.github/workflows/update_native_agent.yml'
   schedule:
