@@ -20,9 +20,11 @@ on:
         required: false
         type: boolean
         default: true
+  # Only on main: a run from a feature branch force-pushes update-native-agents-<version>
+  # (the open bump PR's branch) on top of that feature branch. Test a change with a manual run.
   push:
     branches:
-      - '**'
+      - main
     paths:
       - '.github/workflows/update_native_agent.yml'
   schedule:
@@ -279,6 +281,7 @@ jobs:
           echo "README.md and TestUnityDependencies.xml agree on Android artifact versions"
 
       - name: Update CHANGELOG.md
+        id: changelog
         if: steps.check_updates.outputs.needs_update == 'true'
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
@@ -289,9 +292,8 @@ jobs:
           NDK_UPDATED="${{ steps.check_updates.outputs.ndk_updated }}"
           IOS_UPDATED="${{ steps.check_updates.outputs.ios_updated }}"
 
-          # Create changelog entry. Each bullet must be a single line:
-          # .github/scripts/generate-docs.sh selects them with `grep "^-"` when
-          # building the public docs release notes, so wrapped lines are dropped.
+          # Create changelog entry. The release-notes automation reads each "- " item (indented
+          # lines under an item continue it) into the public docs release notes.
           CHANGELOG_ENTRY="## $NEW_VERSION\n\n## Improvements\n"
 
           if [ "$ANDROID_UPDATED" = "true" ]; then
@@ -314,6 +316,14 @@ jobs:
 
           echo "Updated CHANGELOG.md"
 
+          # The PR's docs-website release note: the CHANGELOG lines above, word for word, so the
+          # release lists each update once.
+          RELEASE_NOTE=""
+          [ "$ANDROID_UPDATED" != "true" ] || RELEASE_NOTE="Native Android agent updated to version ${ANDROID_VERSION}."
+          [ "$NDK_UPDATED" != "true" ] || RELEASE_NOTE="${RELEASE_NOTE:+$RELEASE_NOTE }Native Android NDK agent updated to version ${NDK_VERSION}."
+          [ "$IOS_UPDATED" != "true" ] || RELEASE_NOTE="${RELEASE_NOTE:+$RELEASE_NOTE }Native iOS agent updated to version ${IOS_VERSION}."
+          echo "release_note=$RELEASE_NOTE" >> "$GITHUB_OUTPUT"
+
       - name: Create Pull Request
         if: steps.check_updates.outputs.needs_update == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -322,6 +332,7 @@ jobs:
           commit-message: "chore: update native agents to v${{ steps.new_plugin_version.outputs.new_version }}"
           branch: "update-native-agents-${{ steps.new_plugin_version.outputs.new_version }}"
           delete-branch: true
+          labels: release-note:enhancement
           title: "chore: update native agents to v${{ steps.new_plugin_version.outputs.new_version }}"
           body: |
             ## Updates
@@ -329,6 +340,10 @@ jobs:
             - **Android NDK Agent**: ${{ steps.current_versions.outputs.current_ndk }} → ${{ steps.ndk_version.outputs.version }}
             - **iOS Agent (CocoaPods)**: ${{ steps.current_versions.outputs.current_ios }} → ${{ steps.ios_version.outputs.version }}
             - **Plugin Version**: ${{ steps.current_versions.outputs.current_plugin }} → ${{ steps.new_plugin_version.outputs.new_version }}
+
+            ## Release note
+
+            ${{ steps.changelog.outputs.release_note }}
 
             ## Testing
             - [ ] Android app builds successfully
