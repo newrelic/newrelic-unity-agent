@@ -97,15 +97,27 @@ jobs:
             VERSION="${{ inputs.ios_version }}"
             echo "Using provided iOS version: $VERSION"
           else
-            # Fetch latest version from the newest non-prerelease GitHub release of the iOS agent SPM repo
-            VERSION=$(gh api repos/newrelic/newrelic-ios-agent-spm/releases/latest -q .tag_name | sed 's/^v//')
-            if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-              echo "::error::Could not determine the latest iOS agent version (got '$VERSION')"
-              exit 1
-            fi
+            # Highest X.Y.Z tag on the iOS agent SPM repo. Every production build pushes a tag there, but
+            # GitHub Releases are created by hand and some versions (e.g. 7.7.8) never got one.
+            VERSION=$(gh api --paginate 'repos/newrelic/newrelic-ios-agent-spm/tags?per_page=100' -q '.[].name' | \
+              grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
             echo "Fetched latest iOS version: $VERSION"
           fi
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Could not determine the iOS agent version (got '$VERSION')"
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Only move the NewRelicAgent pod pin to versions that are on CocoaPods. The SPM tag can land before
+          # the pod, and once CocoaPods trunk is read-only new versions won't be published as pods at all; pinning
+          # a pod that doesn't exist breaks `pod install`. 1/a/2 is the CocoaPods CDN shard for NewRelicAgent.
+          if curl -sfL --retry 3 --max-time 30 -o /dev/null "https://cdn.cocoapods.org/Specs/1/a/2/NewRelicAgent/$VERSION/NewRelicAgent.podspec.json"; then
+            echo "pod_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::NewRelicAgent $VERSION is not on CocoaPods; leaving the CocoaPods pin unchanged"
+            echo "pod_available=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Get current versions
         id: current_versions
@@ -119,8 +131,9 @@ jobs:
           # Extract Android NDK agent version from TestUnityDependencies.xml
           CURRENT_NDK=$(xmlstarlet sel -t -v "//androidPackage[contains(@spec, 'agent-ndk')]/@spec" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/.*:\([0-9.]*\).*/\1/')
 
-          # Extract iOS version from TestUnityDependencies.xml (CocoaPods)
-          CURRENT_IOS=$(xmlstarlet sel -t -v "//iosPod[@name='NewRelicAgent']/@version" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/~> //')
+          # Extract iOS version from TestUnityDependencies.xml (CocoaPods). -T outputs plain text; without it
+          # the value comes back XML-escaped (`~&gt; 7.7.9`), the sed doesn't match, and iOS always looks out of date.
+          CURRENT_IOS=$(xmlstarlet sel -T -t -v "//iosPod[@name='NewRelicAgent']/@version" com.newrelic.agent/Editor/TestUnityDependencies.xml | sed 's/~> //')
 
           echo "current_android=$CURRENT_ANDROID" >> $GITHUB_OUTPUT
           echo "current_ndk=$CURRENT_NDK" >> $GITHUB_OUTPUT
@@ -152,7 +165,15 @@ jobs:
             NDK_UPDATED=true
           fi
 
-          if [ "${{ steps.current_versions.outputs.current_ios }}" != "${{ steps.ios_version.outputs.version }}" ]; then
+          # Unity gets the iOS agent only through CocoaPods (EDM4U), so it stays on the current pod
+          # until the latest version is on CocoaPods.
+          IOS_TARGET="${{ steps.ios_version.outputs.version }}"
+          if [ "${{ steps.ios_version.outputs.pod_available }}" != "true" ]; then
+            echo "iOS agent $IOS_TARGET is not on CocoaPods; keeping ${{ steps.current_versions.outputs.current_ios }}"
+            IOS_TARGET="${{ steps.current_versions.outputs.current_ios }}"
+          fi
+
+          if [ "${{ steps.current_versions.outputs.current_ios }}" != "$IOS_TARGET" ]; then
             echo "iOS version needs update"
             NEEDS_UPDATE=true
             IOS_UPDATED=true
@@ -162,6 +183,7 @@ jobs:
           echo "android_updated=$ANDROID_UPDATED" >> $GITHUB_OUTPUT
           echo "ndk_updated=$NDK_UPDATED" >> $GITHUB_OUTPUT
           echo "ios_updated=$IOS_UPDATED" >> $GITHUB_OUTPUT
+          echo "ios_target=$IOS_TARGET" >> $GITHUB_OUTPUT
 
       - name: Calculate new plugin version (patch bump)
         id: new_plugin_version
@@ -200,7 +222,7 @@ jobs:
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
           NDK_VERSION="${{ steps.ndk_version.outputs.version }}"
-          IOS_VERSION="${{ steps.ios_version.outputs.version }}"
+          IOS_VERSION="${{ steps.check_updates.outputs.ios_target }}"
 
           # Update Android agent version
           xmlstarlet ed -L \
@@ -291,7 +313,7 @@ jobs:
         run: |
           ANDROID_VERSION="${{ steps.android_version.outputs.version }}"
           NDK_VERSION="${{ steps.ndk_version.outputs.version }}"
-          IOS_VERSION="${{ steps.ios_version.outputs.version }}"
+          IOS_VERSION="${{ steps.check_updates.outputs.ios_target }}"
           NEW_VERSION="${{ steps.new_plugin_version.outputs.new_version }}"
           ANDROID_UPDATED="${{ steps.check_updates.outputs.android_updated }}"
           NDK_UPDATED="${{ steps.check_updates.outputs.ndk_updated }}"
@@ -343,7 +365,7 @@ jobs:
             ## Updates
             - **Android Agent**: ${{ steps.current_versions.outputs.current_android }} → ${{ steps.android_version.outputs.version }}
             - **Android NDK Agent**: ${{ steps.current_versions.outputs.current_ndk }} → ${{ steps.ndk_version.outputs.version }}
-            - **iOS Agent (CocoaPods)**: ${{ steps.current_versions.outputs.current_ios }} → ${{ steps.ios_version.outputs.version }}
+            - **iOS Agent (CocoaPods)**: ${{ steps.current_versions.outputs.current_ios }} → ${{ steps.check_updates.outputs.ios_target }}
             - **Plugin Version**: ${{ steps.current_versions.outputs.current_plugin }} → ${{ steps.new_plugin_version.outputs.new_version }}
 
             ## Release note
@@ -369,7 +391,7 @@ jobs:
           echo "|-----------|-------------|-------------|" >> $GITHUB_STEP_SUMMARY
           echo "| Android Agent | ${{ steps.current_versions.outputs.current_android }} | ${{ steps.android_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Android NDK Agent | ${{ steps.current_versions.outputs.current_ndk }} | ${{ steps.ndk_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| iOS Agent (CocoaPods) | ${{ steps.current_versions.outputs.current_ios }} | ${{ steps.ios_version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| iOS Agent (CocoaPods) | ${{ steps.current_versions.outputs.current_ios }} | ${{ steps.check_updates.outputs.ios_target }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Plugin Version | ${{ steps.current_versions.outputs.current_plugin }} | ${{ steps.new_plugin_version.outputs.new_version }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: No updates needed
@@ -380,4 +402,4 @@ jobs:
           echo "All native agents are already up to date!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Android Agent: ${{ steps.android_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- iOS Agent: ${{ steps.ios_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- iOS Agent: ${{ steps.check_updates.outputs.ios_target }}" >> $GITHUB_STEP_SUMMARY
