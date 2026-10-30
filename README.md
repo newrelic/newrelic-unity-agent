@@ -123,6 +123,10 @@ If you are utilizing an older version of Unity Studio, you can incorporate a low
 
    The package's `TestUnityDependencies.xml` declares the New Relic iOS agent as a **CocoaPod**, resolved by the bundled External Dependency Manager for Unity (EDM4U).
 
+   > **CocoaPods trunk is becoming read-only.** [CocoaPods plans to make its trunk read-only on December 2, 2026](https://blog.cocoapods.org/CocoaPods-Specs-Repo/). Builds that use already-published pod versions keep working, but no new pod versions, including new releases of the `NewRelicAgent` pod, can be published after that date.
+   >
+   > Option A keeps resolving the last iOS agent version published to trunk. To use iOS agent versions released after that date, use Option B. Swift Package Manager is not an alternative for Unity yet; see the note on Swift Package Manager below.
+
    ### Option A — CocoaPods (recommended)
 
    1. In **Assets → External Dependency Manager → iOS Resolver → Settings**, confirm:
