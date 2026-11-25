@@ -1,0 +1,20 @@
+# Changes to CI, build, packaging and publishing files need a review from the
+# Mobile Agents release owners. The last matching pattern wins, so keep this
+# file's own entry at the bottom.
+
+# CI: workflows, scripts and dependency update config
+/.github/                                       @newrelic/mobagent
+
+# Unity package manifest and assembly definitions
+/package.json                                   @newrelic/mobagent
+*.asmdef                                        @newrelic/mobagent
+
+# Editor code that runs in customer builds, including the native agent
+# dependency declarations
+/com.newrelic.agent/Editor/                     @newrelic/mobagent
+
+# Bundled External Dependency Manager binaries
+/com.newrelic.agent/ExternalDependencyManager/  @newrelic/mobagent
+
+# This file
+/.github/CODEOWNERS                             @newrelic/mobagent
